@@ -1,0 +1,15 @@
+# Arquivos de compilação do Java
+*.class
+bin/
+target/
+
+# Arquivos do ambiente do VS Code e IDEs
+.vscode/
+.settings/
+.classpath
+.project
+
+# Arquivos de log e temporários
+*.log
+*.tmp
+
