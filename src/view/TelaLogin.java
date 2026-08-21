@@ -55,13 +55,13 @@ public class TelaLogin extends JFrame {
         Usuario usuario = controller.autenticar(email, senha);
 
         if (usuario != null) {
-            JOptionPane.showMessageDialog(this,
-                    "Login efetuado com sucesso!\nUsuário: " + usuario.getNome() + "\nPerfil: " + usuario.getPerfil(),
-                    "Acesso Permitido", JOptionPane.INFORMATION_MESSAGE);
-        } else {
-            JOptionPane.showMessageDialog(this,
-                    "E-mail ou senha incorretos!",
-                    "Erro de Autenticação", JOptionPane.ERROR_MESSAGE);
+            // Redireciona para a Tela Principal passando o usuário logado
+        new TelaPrincipal(usuario).setVisible(true);
+        this.dispose(); // Fecha a tela de login
+    } else {
+        JOptionPane.showMessageDialog(this,
+                "E-mail ou senha incorretos!",
+                "Erro de Autenticação", JOptionPane.ERROR_MESSAGE);
         }
     }
 
