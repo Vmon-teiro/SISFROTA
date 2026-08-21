@@ -21,56 +21,62 @@ public class TelaPrincipal extends JFrame {
     }
 
     private void initComponentes() {
-        setLayout(new BorderLayout());
+    setLayout(new BorderLayout());
 
-        // Barra Superior com informações do Usuário
-        JPanel panelHeader = new JPanel(new BorderLayout());
-        panelHeader.setBackground(new Color(41, 128, 185));
-        panelHeader.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
+    // Barra Superior com informações do Usuário
+    JPanel panelHeader = new JPanel(new BorderLayout());
+    panelHeader.setBackground(new Color(41, 128, 185));
+    panelHeader.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
 
-        JLabel lblBemVindo = new JLabel("Usuário: " + usuarioLogado.getNome() + " | Perfil: " + usuarioLogado.getPerfil());
-        lblBemVindo.setForeground(Color.WHITE);
-        lblBemVindo.setFont(new Font("SansSerif", Font.BOLD, 14));
+    JLabel lblBemVindo = new JLabel("Usuário: " + usuarioLogado.getNome() + " | Perfil: " + usuarioLogado.getPerfil());
+    lblBemVindo.setForeground(Color.WHITE);
+    lblBemVindo.setFont(new Font("SansSerif", Font.BOLD, 14));
 
-        JButton btnSair = new JButton("Sair / Logout");
-        btnSair.addActionListener(e -> {
-            new TelaLogin().setVisible(true);
-            dispose();
-        });
+    JButton btnSair = new JButton("Sair / Logout");
+    btnSair.addActionListener(e -> {
+        new TelaLogin().setVisible(true);
+        dispose();
+    });
 
-        panelHeader.add(lblBemVindo, BorderLayout.WEST);
-        panelHeader.add(btnSair, BorderLayout.EAST);
-        add(panelHeader, BorderLayout.NORTH);
+    panelHeader.add(lblBemVindo, BorderLayout.WEST);
+    panelHeader.add(btnSair, BorderLayout.EAST);
+    add(panelHeader, BorderLayout.NORTH);
 
-        // Painel Central Dinâmico baseado no Perfil
-        JPanel panelMenu = new JPanel(new GridLayout(2, 2, 15, 15));
-        panelMenu.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+    // Painel Central Dinâmico baseado no Perfil
+    JPanel panelMenu = new JPanel(new GridLayout(2, 2, 15, 15));
+    panelMenu.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        switch (usuarioLogado.getPerfil()) {
-            case "ADMINISTRADOR":
-                JButton btnEmbarcacoes = new JButton("Gerenciar Embarcações");
-                btnEmbarcacoes.addActionListener(e -> new TelaEmbarcacoes().setVisible(true));
-                panelMenu.add(btnEmbarcacoes);
-                panelMenu.add(new JButton("Gerenciar Tripulação"));
-                panelMenu.add(new JButton("Relatórios de Custos"));
-                panelMenu.add(new JButton("Documentações e Vistorias"));
-                break;
+    switch (usuarioLogado.getPerfil()) {
+        case "ADMINISTRADOR":
+            JButton btnEmbarcacoesAdmin = new JButton("Gerenciar Embarcações");
+            btnEmbarcacoesAdmin.addActionListener(e -> new TelaEmbarcacoes().setVisible(true));
+            panelMenu.add(btnEmbarcacoesAdmin);
 
-            case "OPERADOR":
-                panelMenu.add(new JButton("Registrar Viagem"));
-                panelMenu.add(new JButton("Registrar Abastecimento"));
-                panelMenu.add(new JButton("Registrar Incidente"));
-                panelMenu.add(new JButton("Consultar Horários"));
-                break;
+            JButton btnManutencaoAdmin = new JButton("Manutenções e Preventivas");
+            btnManutencaoAdmin.addActionListener(e -> new TelaManutencoes().setVisible(true));
+            panelMenu.add(btnManutencaoAdmin);
 
-            case "TECNICO":
-                panelMenu.add(new JButton("Ordens de Serviço / Manutenção"));
-                panelMenu.add(new JButton("Alertas de Horímetro"));
-                panelMenu.add(new JButton("Histórico de Motores"));
-                panelMenu.add(new JButton("Agendar Revisão"));
-                break;
+            panelMenu.add(new JButton("Gerenciar Tripulação"));
+            panelMenu.add(new JButton("Relatórios de Custos"));
+            break;
+
+        case "OPERADOR":
+            panelMenu.add(new JButton("Registrar Viagem"));
+            panelMenu.add(new JButton("Registrar Abastecimento"));
+            panelMenu.add(new JButton("Registrar Incidente"));
+            panelMenu.add(new JButton("Consultar Horários"));
+            break;
+
+        case "TECNICO":
+            JButton btnManutencaoTecnico = new JButton("Ordens de Serviço / Manutenção");
+            btnManutencaoTecnico.addActionListener(e -> new TelaManutencoes().setVisible(true));
+            panelMenu.add(btnManutencaoTecnico);
+
+            panelMenu.add(new JButton("Alertas de Horímetro"));
+            panelMenu.add(new JButton("Histórico de Motores"));
+            panelMenu.add(new JButton("Agendar Revisão"));
+            break;
         }
-
-        add(panelMenu, BorderLayout.CENTER);
+      add(panelMenu, BorderLayout.CENTER);
     }
 }
