@@ -48,7 +48,9 @@ public class TelaPrincipal extends JFrame {
 
         switch (usuarioLogado.getPerfil()) {
             case "ADMINISTRADOR":
-                panelMenu.add(new JButton("Gerenciar Embarcações"));
+                JButton btnEmbarcacoes = new JButton("Gerenciar Embarcações");
+                btnEmbarcacoes.addActionListener(e -> new TelaEmbarcacoes().setVisible(true));
+                panelMenu.add(btnEmbarcacoes);
                 panelMenu.add(new JButton("Gerenciar Tripulação"));
                 panelMenu.add(new JButton("Relatórios de Custos"));
                 panelMenu.add(new JButton("Documentações e Vistorias"));
