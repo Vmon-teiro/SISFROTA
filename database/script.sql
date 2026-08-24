@@ -155,8 +155,8 @@ INSERT INTO embarcacoes (nome, modelo, capacidade_passageiros, ano_fabricacao, h
 
 -- Tripulantes
 INSERT INTO tripulantes (nome, cpf, categoria_habilitacao, numero_registro_cir, data_vencimento_cir) VALUES
-('Capitão João Silva', '111.222.333-44', 'PILOTO_FLUVIAL', 'CIR-998877', '2027-12-31'),
-('Condutor Marcos Souza', '555.666.777-88', 'CONDUTOR_FLUVIAL', 'CIR-112233', '2026-06-15');
+('João Silva', '111.222.333-44', 'PILOTO_FLUVIAL', 'CIR-998877', '2027-12-31'),
+('Marcos Souza', '555.666.777-88', 'CONDUTOR_FLUVIAL', 'CIR-112233', '2026-06-15');
 
 -- Documentação de Embarcação
 INSERT INTO documentos_embarcacao (id_embarcacao, tipo_documento, numero_documento, data_emissao, data_vencimento, status) VALUES
