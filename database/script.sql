@@ -143,7 +143,7 @@ CREATE TABLE incidentes (
 
 -- Usuários para teste de Login e Dashboards
 INSERT INTO usuarios (nome, email, senha, perfil) VALUES
-('Vitor Monteiro (Admin)', 'admin@nautica.com', 'admin123', 'ADMINISTRADOR'),
+('Vitoria Monteiro (Admin)', 'admin@nautica.com', 'admin123', 'ADMINISTRADOR'),
 ('Carlos Despachante', 'operador@nautica.com', 'operador123', 'OPERADOR'),
 ('Roberto Engenheiro', 'tecnico@nautica.com', 'tecnico123', 'TECNICO');
 
