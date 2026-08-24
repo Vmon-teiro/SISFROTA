@@ -56,7 +56,10 @@ public class TelaPrincipal extends JFrame {
             btnManutencaoAdmin.addActionListener(e -> new TelaManutencoes().setVisible(true));
             panelMenu.add(btnManutencaoAdmin);
 
-            panelMenu.add(new JButton("Gerenciar Tripulação"));
+            JButton btnTripulacaoAdmin = new JButton("Gerenciar Tripulação");
+            btnTripulacaoAdmin.addActionListener(e -> new TelaTripulantes().setVisible(true));
+            panelMenu.add(btnTripulacaoAdmin);
+
             panelMenu.add(new JButton("Relatórios de Custos"));
             break;
 
