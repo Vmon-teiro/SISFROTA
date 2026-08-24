@@ -1,6 +1,7 @@
 package dao;
 
 import model.Tripulante;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +32,32 @@ public class TripulanteDAO {
             System.err.println("Erro ao listar tripulantes: " + e.getMessage());
         }
         return lista;
+    }
+
+    public Tripulante buscarPorId(int id) {
+        String sql = "SELECT * FROM tripulantes WHERE id = ?";
+
+        try (Connection conn = ConexaoDAO.obterConexao();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, id);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return new Tripulante(
+                        rs.getInt("id"),
+                        rs.getString("nome"),
+                        rs.getString("cpf"),
+                        rs.getString("categoria_habilitacao"),
+                        rs.getString("numero_registro_cir"),
+                        rs.getDate("data_vencimento_cir"),
+                        rs.getString("status")
+                    );
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Erro ao buscar tripulante por ID: " + e.getMessage());
+        }
+        return null;
     }
 
     public boolean cadastrar(Tripulante t) {

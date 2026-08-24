@@ -40,6 +40,38 @@ public class ManutencaoDAO {
         return lista;
     }
 
+    public Manutencao buscarPorId(int id) {
+        String sql = "SELECT m.*, e.nome AS nome_embarcacao " +
+                     "FROM manutencoes m " +
+                     "JOIN embarcacoes e ON m.id_embarcacao = e.id " +
+                     "WHERE m.id = ?";
+
+        try (Connection conn = ConexaoDAO.obterConexao();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, id);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return new Manutencao(
+                        rs.getInt("id"),
+                        rs.getInt("id_embarcacao"),
+                        rs.getString("nome_embarcacao"),
+                        rs.getString("tipo_manutencao"),
+                        rs.getString("descricao_servico"),
+                        (Integer) rs.getObject("horimetro_agendado"),
+                        rs.getDate("data_agendamento"),
+                        rs.getDate("data_execucao"),
+                        rs.getDouble("custo_total"),
+                        rs.getString("status")
+                    );
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Erro ao buscar manutenção por ID: " + e.getMessage());
+        }
+        return null;
+    }
+
     public boolean cadastrar(Manutencao m) {
         String sql = "INSERT INTO manutencoes (id_embarcacao, tipo_manutencao, descricao_servico, horimetro_agendado, data_agendamento, status) " +
                      "VALUES (?, ?, ?, ?, ?, ?)";
@@ -63,6 +95,23 @@ public class ManutencaoDAO {
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
             System.err.println("Erro ao agendar manutenção: " + e.getMessage());
+            return false;
+        }
+    }
+
+    public boolean concluirManutencao(int id, Date dataExecucao, double custoTotal) {
+        String sql = "UPDATE manutencoes SET data_execucao = ?, custo_total = ?, status = 'Concluída' WHERE id = ?";
+
+        try (Connection conn = ConexaoDAO.obterConexao();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setDate(1, dataExecucao);
+            stmt.setDouble(2, custoTotal);
+            stmt.setInt(3, id);
+
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.err.println("Erro ao concluir manutenção: " + e.getMessage());
             return false;
         }
     }

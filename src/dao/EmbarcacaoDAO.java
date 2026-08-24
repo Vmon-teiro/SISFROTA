@@ -35,6 +35,33 @@ public class EmbarcacaoDAO {
         return lista;
     }
 
+    public Embarcacao buscarPorId(int id) {
+        String sql = "SELECT * FROM embarcacoes WHERE id = ?";
+
+        try (Connection conn = ConexaoDAO.obterConexao();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, id);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return new Embarcacao(
+                        rs.getInt("id"),
+                        rs.getString("nome"),
+                        rs.getString("modelo"),
+                        rs.getInt("capacidade_passageiros"),
+                        rs.getDouble("capacidade_carga_ton"),
+                        rs.getInt("ano_fabricacao"),
+                        rs.getInt("horimetro_horas"),
+                        rs.getString("status")
+                    );
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Erro ao buscar embarcação por ID: " + e.getMessage());
+        }
+        return null;
+    }
+
     public boolean cadastrar(Embarcacao emb) {
         String sql = "INSERT INTO embarcacoes (nome, modelo, capacidade_passageiros, capacidade_carga_ton, ano_fabricacao, horimetro_horas, status) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
