@@ -100,19 +100,19 @@ public class ManutencaoDAO {
     }
 
     public boolean concluirManutencao(int id, Date dataExecucao, double custoTotal) {
-        String sql = "UPDATE manutencoes SET data_execucao = ?, custo_total = ?, status = 'Concluída' WHERE id = ?";
+       String sql = "UPDATE manutencoes SET data_execucao = ?, custo_total = ?, status = 'CONCLUIDA' WHERE id = ?";
 
-        try (Connection conn = ConexaoDAO.obterConexao();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+       try (Connection conn = ConexaoDAO.obterConexao();
+         PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setDate(1, dataExecucao);
-            stmt.setDouble(2, custoTotal);
-            stmt.setInt(3, id);
+        stmt.setDate(1, dataExecucao);
+        stmt.setDouble(2, custoTotal);
+        stmt.setInt(3, id);
 
-            return stmt.executeUpdate() > 0;
-        } catch (SQLException e) {
-            System.err.println("Erro ao concluir manutenção: " + e.getMessage());
-            return false;
-        }
+        return stmt.executeUpdate() > 0;
+    } catch (SQLException e) {
+        System.err.println("Erro ao concluir manutenção: " + e.getMessage());
+        return false;
     }
+   }
 }

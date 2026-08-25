@@ -18,11 +18,14 @@ public class TripulanteController {
         return dao.listarTodos();
     }
 
+    public Tripulante buscarPorId(int id) {
+        return dao.buscarPorId(id);
+    }
+
     public boolean cadastrar(String nome, String cpf, String categoria, String cir, String vencimentoStr, String status) {
         if (nome == null || nome.trim().isEmpty() || cpf == null || cpf.trim().isEmpty() || vencimentoStr == null || vencimentoStr.trim().isEmpty()) {
             return false;
         }
-
         try {
             Date dataVencimento = Date.valueOf(vencimentoStr.trim());
             Tripulante t = new Tripulante(0, nome.trim(), cpf.trim(), categoria, cir.trim(), dataVencimento, status);

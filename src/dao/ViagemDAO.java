@@ -28,7 +28,7 @@ public class ViagemDAO {
 
     public List<Viagem> listarTodas() {
         List<Viagem> lista = new ArrayList<>();
-        String sql = "SELECT * FROM viagens ORDER BY data_saida DESC";
+        String sql = "SELECT id, id_embarcacao, id_tripulante, destino, data_saida, status FROM viagens ORDER BY data_saida DESC";
 
         try (Connection conn = ConexaoDAO.obterConexao();
              PreparedStatement stmt = conn.prepareStatement(sql);
@@ -40,7 +40,12 @@ public class ViagemDAO {
                 v.setIdEmbarcacao(rs.getInt("id_embarcacao"));
                 v.setIdTripulante(rs.getInt("id_tripulante"));
                 v.setDestino(rs.getString("destino"));
-                v.setDataSaida(rs.getTimestamp("data_saida").toLocalDateTime());
+                
+                Timestamp ts = rs.getTimestamp("data_saida");
+                if (ts != null) {
+                    v.setDataSaida(ts.toLocalDateTime());
+                }
+                
                 v.setStatus(rs.getString("status"));
                 lista.add(v);
             }

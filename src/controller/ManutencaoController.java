@@ -9,6 +9,7 @@ import java.sql.Date;
 import java.util.List;
 
 public class ManutencaoController {
+
     private ManutencaoDAO manutencaoDAO;
     private EmbarcacaoDAO embarcacaoDAO;
 
@@ -23,7 +24,6 @@ public class ManutencaoController {
                 return false;
             }
 
-            // Utiliza o embarcacaoDAO para validar se a embarcação existe
             Embarcacao emb = embarcacaoDAO.buscarPorId(idEmbarcacao);
             if (emb == null) {
                 System.err.println("Embarcação não encontrada.");
