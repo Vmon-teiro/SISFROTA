@@ -63,27 +63,31 @@ public class TelaPrincipal extends JFrame {
         add(panelHeader, BorderLayout.NORTH);
 
         // Painel Central Dinâmico baseado no Perfil
-        JPanel panelMenu = new JPanel(new GridLayout(2, 2, 15, 15));
+        JPanel panelMenu = new JPanel(new GridLayout(0, 2, 15, 15));
         panelMenu.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
         switch (usuarioLogado.getPerfil()) {
             case "ADMINISTRADOR":
-                JButton btnEmbarcacoesAdmin = new JButton("Gerenciar Embarcações");
-                btnEmbarcacoesAdmin.addActionListener(e -> new TelaEmbarcacoes().setVisible(true));
-                panelMenu.add(btnEmbarcacoesAdmin);
+               JButton btnDashboardAdmin = new JButton("Dashboard / Indicadores");
+               btnDashboardAdmin.addActionListener(e -> new TelaDashboardAdmin().setVisible(true));
+               panelMenu.add(btnDashboardAdmin);
 
-                JButton btnManutencaoAdmin = new JButton("Manutenções e Preventivas");
-                btnManutencaoAdmin.addActionListener(e -> new TelaManutencoes().setVisible(true));
-                panelMenu.add(btnManutencaoAdmin);
+              JButton btnEmbarcacoesAdmin = new JButton("Gerenciar Embarcações");
+              btnEmbarcacoesAdmin.addActionListener(e -> new TelaEmbarcacoes().setVisible(true));
+              panelMenu.add(btnEmbarcacoesAdmin);
 
-                JButton btnTripulacaoAdmin = new JButton("Gerenciar Tripulação");
-                btnTripulacaoAdmin.addActionListener(e -> new TelaTripulantes().setVisible(true));
-                panelMenu.add(btnTripulacaoAdmin);
+             JButton btnManutencaoAdmin = new JButton("Manutenções e Preventivas");
+             btnManutencaoAdmin.addActionListener(e -> new TelaManutencoes().setVisible(true));
+             panelMenu.add(btnManutencaoAdmin);
 
-                JButton btnRelatoriosAdmin = new JButton("Relatórios de Custos");
-                btnRelatoriosAdmin.addActionListener(e -> new TelaRelatorios().setVisible(true));
-                panelMenu.add(btnRelatoriosAdmin);
-                break;
+              JButton btnTripulacaoAdmin = new JButton("Gerenciar Tripulação");
+              btnTripulacaoAdmin.addActionListener(e -> new TelaTripulantes().setVisible(true));
+              panelMenu.add(btnTripulacaoAdmin);
+ 
+              JButton btnRelatoriosAdmin = new JButton("Relatórios de Custos (PDF)");
+              btnRelatoriosAdmin.addActionListener(e -> new TelaRelatorios().setVisible(true));
+              panelMenu.add(btnRelatoriosAdmin);
+              break;
 
             case "OPERADOR":
                 JButton btnViagemOp = new JButton("Registrar Viagem");
