@@ -72,43 +72,42 @@ public class TelaPrincipal extends JFrame {
                btnDashboardAdmin.addActionListener(e -> new TelaDashboardAdmin().setVisible(true));
                panelMenu.add(btnDashboardAdmin);
 
-              JButton btnEmbarcacoesAdmin = new JButton("Gerenciar Embarcações");
-              btnEmbarcacoesAdmin.addActionListener(e -> new TelaEmbarcacoes().setVisible(true));
-              panelMenu.add(btnEmbarcacoesAdmin);
+               JButton btnEmbarcacoesAdmin = new JButton("Gerenciar Embarcações");
+               btnEmbarcacoesAdmin.addActionListener(e -> new TelaEmbarcacoes().setVisible(true));
+               panelMenu.add(btnEmbarcacoesAdmin);
 
-             JButton btnManutencaoAdmin = new JButton("Manutenções e Preventivas");
-             btnManutencaoAdmin.addActionListener(e -> new TelaManutencoes().setVisible(true));
-             panelMenu.add(btnManutencaoAdmin);
+               JButton btnManutencaoAdmin = new JButton("Manutenções e Preventivas");
+               btnManutencaoAdmin.addActionListener(e -> new TelaManutencoes().setVisible(true));
+               panelMenu.add(btnManutencaoAdmin);
 
-              JButton btnTripulacaoAdmin = new JButton("Gerenciar Tripulação");
-              btnTripulacaoAdmin.addActionListener(e -> new TelaTripulantes().setVisible(true));
-              panelMenu.add(btnTripulacaoAdmin);
+               JButton btnTripulacaoAdmin = new JButton("Gerenciar Tripulação");
+               btnTripulacaoAdmin.addActionListener(e -> new TelaTripulantes().setVisible(true));
+               panelMenu.add(btnTripulacaoAdmin);
  
-              JButton btnRelatoriosAdmin = new JButton("Relatórios de Custos (PDF)");
-              btnRelatoriosAdmin.addActionListener(e -> new TelaRelatorios().setVisible(true));
-              panelMenu.add(btnRelatoriosAdmin);
-              break;
+               JButton btnRelatoriosAdmin = new JButton("Relatórios de Custos (PDF)");
+               btnRelatoriosAdmin.addActionListener(e -> new TelaRelatorios().setVisible(true));
+               panelMenu.add(btnRelatoriosAdmin);
+               break;
 
             case "OPERADOR":
-                JButton btnViagemOp = new JButton("Registrar Viagem");
-                btnViagemOp.addActionListener(e -> new TelaViagens().setVisible(true));
-                panelMenu.add(btnViagemOp);
+                   JButton btnViagemOp = new JButton("Registrar Viagem");
+                   btnViagemOp.addActionListener(e -> new TelaViagens().setVisible(true));
+                   panelMenu.add(btnViagemOp);
 
-                JButton btnAbastecimentoOp = new JButton("Registrar Abastecimento");
-                btnAbastecimentoOp.addActionListener(e -> 
-                    JOptionPane.showMessageDialog(this, "Tela de Abastecimentos em desenvolvimento.", "Aviso", JOptionPane.INFORMATION_MESSAGE));
-                panelMenu.add(btnAbastecimentoOp);
+                   JButton btnAbastecimentoOp = new JButton("Registrar Abastecimento");
+                   btnAbastecimentoOp.addActionListener(e -> new TelaAbastecimento().setVisible(true));
+                   panelMenu.add(btnAbastecimentoOp);
 
-                JButton btnIncidenteOp = new JButton("Registrar Incidente");
-                btnIncidenteOp.addActionListener(e -> 
-                    JOptionPane.showMessageDialog(this, "Tela de Incidentes em desenvolvimento.", "Aviso", JOptionPane.INFORMATION_MESSAGE));
-                panelMenu.add(btnIncidenteOp);
+                   JButton btnIncidenteOp = new JButton("Registrar Incidente");
+                   btnIncidenteOp.addActionListener(e -> 
+                   JOptionPane.showMessageDialog(this, "Tela de Incidentes em desenvolvimento.", "Aviso", JOptionPane.INFORMATION_MESSAGE));
+                   panelMenu.add(btnIncidenteOp);
 
-                JButton btnHorariosOp = new JButton("Consultar Horários");
-                btnHorariosOp.addActionListener(e -> 
-                    JOptionPane.showMessageDialog(this, "Consulta de Horários em desenvolvimento.", "Aviso", JOptionPane.INFORMATION_MESSAGE));
-                panelMenu.add(btnHorariosOp);
-                break;
+                   JButton btnHorariosOp = new JButton("Consultar Horários");
+                   btnHorariosOp.addActionListener(e -> 
+                   JOptionPane.showMessageDialog(this, "Consulta de Horários em desenvolvimento.", "Aviso", JOptionPane.INFORMATION_MESSAGE));
+                   panelMenu.add(btnHorariosOp);
+                   break;
 
             case "TECNICO":
                 JButton btnManutencaoTecnico = new JButton("Ordens de Serviço / Manutenção");
@@ -117,12 +116,12 @@ public class TelaPrincipal extends JFrame {
 
                 JButton btnAlertas = new JButton("Alertas de Horímetro");
                 btnAlertas.addActionListener(e -> 
-                    JOptionPane.showMessageDialog(this, "Tela de Alertas em desenvolvimento.", "Aviso", JOptionPane.INFORMATION_MESSAGE));
+                JOptionPane.showMessageDialog(this, "Tela de Alertas em desenvolvimento.", "Aviso", JOptionPane.INFORMATION_MESSAGE));
                 panelMenu.add(btnAlertas);
 
                 JButton btnHistorico = new JButton("Histórico de Motores");
                 btnHistorico.addActionListener(e -> 
-                    JOptionPane.showMessageDialog(this, "Histórico em desenvolvimento.", "Aviso", JOptionPane.INFORMATION_MESSAGE));
+                JOptionPane.showMessageDialog(this, "Histórico em desenvolvimento.", "Aviso", JOptionPane.INFORMATION_MESSAGE));
                 panelMenu.add(btnHistorico);
 
                 JButton btnRevisao = new JButton("Agendar Revisão");
