@@ -14,7 +14,7 @@ public class TelaPrincipal extends JFrame {
     public TelaPrincipal(Usuario usuario) {
         this.usuarioLogado = usuario;
         setTitle("Gestão Náutica - Painel Principal");
-        setSize(700, 450);
+        setSize(800, 500);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         
@@ -30,7 +30,7 @@ public class TelaPrincipal extends JFrame {
             if (!alertas.isEmpty()) {
                 StringBuilder mensagem = new StringBuilder("Atenção! Existem pendências com vencimento próximo (15 dias):\n\n");
                 for (String alerta : alertas) {
-                    mensagem.append(alerta).append("\n");
+                    mensagem.append("• ").append(alerta).append("\n");
                 }
                 JOptionPane.showMessageDialog(this, 
                     mensagem.toString(), 
@@ -46,13 +46,14 @@ public class TelaPrincipal extends JFrame {
         // Barra Superior com informações do Usuário
         JPanel panelHeader = new JPanel(new BorderLayout());
         panelHeader.setBackground(new Color(41, 128, 185));
-        panelHeader.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
+        panelHeader.setBorder(BorderFactory.createEmptyBorder(12, 18, 12, 18));
 
-        JLabel lblBemVindo = new JLabel("Usuário: " + usuarioLogado.getNome() + " | Perfil: " + usuarioLogado.getPerfil());
+        JLabel lblBemVindo = new JLabel("Usuário: " + usuarioLogado.getNome() + "  |  Perfil: " + usuarioLogado.getPerfil());
         lblBemVindo.setForeground(Color.WHITE);
         lblBemVindo.setFont(new Font("SansSerif", Font.BOLD, 14));
 
         JButton btnSair = new JButton("Sair / Logout");
+        btnSair.setFocusPainted(false);
         btnSair.addActionListener(e -> {
             new TelaLogin().setVisible(true);
             dispose();
@@ -64,72 +65,49 @@ public class TelaPrincipal extends JFrame {
 
         // Painel Central Dinâmico baseado no Perfil
         JPanel panelMenu = new JPanel(new GridLayout(0, 2, 15, 15));
-        panelMenu.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        panelMenu.setBorder(BorderFactory.createEmptyBorder(20, 25, 20, 25));
 
-        switch (usuarioLogado.getPerfil()) {
+        String perfil = usuarioLogado.getPerfil() != null ? usuarioLogado.getPerfil().toUpperCase() : "";
+
+        switch (perfil) {
             case "ADMINISTRADOR":
-               JButton btnDashboardAdmin = new JButton("Dashboard / Indicadores");
-               btnDashboardAdmin.addActionListener(e -> new TelaDashboardAdmin().setVisible(true));
-               panelMenu.add(btnDashboardAdmin);
-
-               JButton btnEmbarcacoesAdmin = new JButton("Gerenciar Embarcações");
-               btnEmbarcacoesAdmin.addActionListener(e -> new TelaEmbarcacoes().setVisible(true));
-               panelMenu.add(btnEmbarcacoesAdmin);
-
-               JButton btnManutencaoAdmin = new JButton("Manutenções e Preventivas");
-               btnManutencaoAdmin.addActionListener(e -> new TelaManutencoes().setVisible(true));
-               panelMenu.add(btnManutencaoAdmin);
-
-               JButton btnTripulacaoAdmin = new JButton("Gerenciar Tripulação");
-               btnTripulacaoAdmin.addActionListener(e -> new TelaTripulantes().setVisible(true));
-               panelMenu.add(btnTripulacaoAdmin);
- 
-               JButton btnRelatoriosAdmin = new JButton("Relatórios de Custos (PDF)");
-               btnRelatoriosAdmin.addActionListener(e -> new TelaRelatorios().setVisible(true));
-               panelMenu.add(btnRelatoriosAdmin);
-               break;
+                panelMenu.add(criarBotaoMenu("Dashboard / Indicadores", e -> new TelaDashboardAdmin().setVisible(true)));
+                panelMenu.add(criarBotaoMenu("Gerenciar Embarcações", e -> new TelaEmbarcacoes().setVisible(true)));
+                panelMenu.add(criarBotaoMenu("Manutenções e Preventivas", e -> new TelaManutencoes().setVisible(true)));
+                panelMenu.add(criarBotaoMenu("Gerenciar Tripulação", e -> new TelaTripulantes().setVisible(true)));
+                panelMenu.add(criarBotaoMenu("Registrar Abastecimento", e -> new TelaAbastecimento().setVisible(true)));
+                panelMenu.add(criarBotaoMenu("Relatórios de Custos (PDF)", e -> new TelaRelatorios().setVisible(true)));
+                break;
 
             case "OPERADOR":
-                   JButton btnViagemOp = new JButton("Registrar Viagem");
-                   btnViagemOp.addActionListener(e -> new TelaViagens().setVisible(true));
-                   panelMenu.add(btnViagemOp);
-
-                   JButton btnAbastecimentoOp = new JButton("Registrar Abastecimento");
-                   btnAbastecimentoOp.addActionListener(e -> new TelaAbastecimento().setVisible(true));
-                   panelMenu.add(btnAbastecimentoOp);
-
-                   JButton btnIncidenteOp = new JButton("Registrar Incidente");
-                   btnIncidenteOp.addActionListener(e -> 
-                   JOptionPane.showMessageDialog(this, "Tela de Incidentes em desenvolvimento.", "Aviso", JOptionPane.INFORMATION_MESSAGE));
-                   panelMenu.add(btnIncidenteOp);
-
-                   JButton btnHorariosOp = new JButton("Consultar Horários");
-                   btnHorariosOp.addActionListener(e -> 
-                   JOptionPane.showMessageDialog(this, "Consulta de Horários em desenvolvimento.", "Aviso", JOptionPane.INFORMATION_MESSAGE));
-                   panelMenu.add(btnHorariosOp);
-                   break;
+                panelMenu.add(criarBotaoMenu("Registrar Viagem", e -> new TelaViagens().setVisible(true)));
+                panelMenu.add(criarBotaoMenu("Registrar Abastecimento", e -> new TelaAbastecimento().setVisible(true)));
+                panelMenu.add(criarBotaoMenu("Registrar Incidente", e -> new TelaIncidente().setVisible(true)));
+                panelMenu.add(criarBotaoMenu("Consultar Horários", e -> new TelaConsultaHorarios().setVisible(true)));
+                break;
 
             case "TECNICO":
-                JButton btnManutencaoTecnico = new JButton("Ordens de Serviço / Manutenção");
-                btnManutencaoTecnico.addActionListener(e -> new TelaManutencoes().setVisible(true));
-                panelMenu.add(btnManutencaoTecnico);
+                panelMenu.add(criarBotaoMenu("Ordens de Serviço / Manutenção", e -> new TelaManutencoes().setVisible(true)));
+                panelMenu.add(criarBotaoMenu("Agendar Revisão", e -> new TelaManutencoes().setVisible(true)));
+                panelMenu.add(criarBotaoMenu("Alertas de Horímetro", e -> 
+                    JOptionPane.showMessageDialog(this, "Tela de Alertas em desenvolvimento.", "Aviso", JOptionPane.INFORMATION_MESSAGE)));
+                panelMenu.add(criarBotaoMenu("Histórico de Motores", e -> 
+                    JOptionPane.showMessageDialog(this, "Histórico em desenvolvimento.", "Aviso", JOptionPane.INFORMATION_MESSAGE)));
+                break;
 
-                JButton btnAlertas = new JButton("Alertas de Horímetro");
-                btnAlertas.addActionListener(e -> 
-                JOptionPane.showMessageDialog(this, "Tela de Alertas em desenvolvimento.", "Aviso", JOptionPane.INFORMATION_MESSAGE));
-                panelMenu.add(btnAlertas);
-
-                JButton btnHistorico = new JButton("Histórico de Motores");
-                btnHistorico.addActionListener(e -> 
-                JOptionPane.showMessageDialog(this, "Histórico em desenvolvimento.", "Aviso", JOptionPane.INFORMATION_MESSAGE));
-                panelMenu.add(btnHistorico);
-
-                JButton btnRevisao = new JButton("Agendar Revisão");
-                btnRevisao.addActionListener(e -> new TelaManutencoes().setVisible(true));
-                panelMenu.add(btnRevisao);
+            default:
+                JOptionPane.showMessageDialog(this, "Perfil de usuário não reconhecido.", "Erro de Permissão", JOptionPane.ERROR_MESSAGE);
                 break;
         }
 
         add(panelMenu, BorderLayout.CENTER);
+    }
+
+    private JButton criarBotaoMenu(String texto, java.awt.event.ActionListener acao) {
+        JButton btn = new JButton(texto);
+        btn.setFont(new Font("SansSerif", Font.BOLD, 13));
+        btn.setFocusPainted(false);
+        btn.addActionListener(acao);
+        return btn;
     }
 }

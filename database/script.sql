@@ -17,8 +17,9 @@ DROP TABLE IF EXISTS incidentes;
 DROP TABLE IF EXISTS abastecimentos;
 DROP TABLE IF EXISTS manutencoes;
 DROP TABLE IF EXISTS viagens;
-DROP TABLE IF EXISTS rotas;
 DROP TABLE IF EXISTS documentos_embarcacao;
+DROP TABLE IF EXISTS fornecedores;
+DROP TABLE IF EXISTS rotas;
 DROP TABLE IF EXISTS tripulantes;
 DROP TABLE IF EXISTS embarcacoes;
 DROP TABLE IF EXISTS usuarios;
@@ -73,7 +74,15 @@ CREATE TABLE rotas (
 ) ENGINE=InnoDB;
 
 -- ------------------------------------------------------------
--- 5. TABELA DE DOCUMENTAÇÃO OBRIGATÓRIA (RF09)
+-- 5. TABELA DE POSTOS E FORNECEDORES
+-- ------------------------------------------------------------
+CREATE TABLE fornecedores (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL
+) ENGINE=InnoDB;
+
+-- ------------------------------------------------------------
+-- 6. TABELA DE DOCUMENTAÇÃO OBRIGATÓRIA (RF09)
 -- ------------------------------------------------------------
 CREATE TABLE documentos_embarcacao (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -87,7 +96,7 @@ CREATE TABLE documentos_embarcacao (
 ) ENGINE=InnoDB;
 
 -- ------------------------------------------------------------
--- 6. TABELA DE REGISTRO DE VIAGENS (RF05, RN01, RN02)
+-- 7. TABELA DE REGISTRO DE VIAGENS (RF05, RN01, RN02)
 -- ------------------------------------------------------------
 CREATE TABLE viagens (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -103,7 +112,7 @@ CREATE TABLE viagens (
 ) ENGINE=InnoDB;
 
 -- ------------------------------------------------------------
--- 7. TABELA DE MANUTENÇÕES E AGENDAMENTOS (RF03, RF04, RF06, RF08)
+-- 8. TABELA DE MANUTENÇÕES E AGENDAMENTOS (RF03, RF04, RF06, RF08)
 -- ------------------------------------------------------------
 CREATE TABLE manutencoes (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -119,7 +128,7 @@ CREATE TABLE manutencoes (
 ) ENGINE=InnoDB;
 
 -- ------------------------------------------------------------
--- 8. TABELA DE ABASTECIMENTOS DE COMBUSTÍVEL (RF11)
+-- 9. TABELA DE ABASTECIMENTOS DE COMBUSTÍVEL (RF11)
 -- ------------------------------------------------------------
 CREATE TABLE abastecimentos (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -132,7 +141,7 @@ CREATE TABLE abastecimentos (
 ) ENGINE=InnoDB;
 
 -- ------------------------------------------------------------
--- 9. TABELA DE INCIDENTES OPERACIONAIS (RF12)
+-- 10. TABELA DE INCIDENTES OPERACIONAIS (RF12)
 -- ------------------------------------------------------------
 CREATE TABLE incidentes (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -175,6 +184,14 @@ INSERT INTO rotas (nome) VALUES
 ('Tefé'),
 ('Coari'),
 ('Tabatinga');
+
+-- Postos e Fornecedores
+INSERT INTO fornecedores (nome) VALUES 
+('Posto Fluvial Rio Negro'),
+('Posto Ponta Negra'),
+('Distribuidora Equador Fluvial'),
+('Posto Fluvial Solimões'),
+('Posto Náutico Careiro');
 
 -- Documentos
 INSERT INTO documentos_embarcacao (id_embarcacao, tipo_documento, numero_documento, data_emissao, data_vencimento, status) VALUES

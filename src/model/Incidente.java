@@ -24,10 +24,22 @@ public class Incidente {
 
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
+
     public int getIdEmbarcacao() { return idEmbarcacao; }
+    public void setIdEmbarcacao(int idEmbarcacao) { this.idEmbarcacao = idEmbarcacao; }
+
     public Integer getIdViagem() { return idViagem; }
+    public void setIdViagem(Integer idViagem) { this.idViagem = idViagem; }
+
     public LocalDateTime getDataIncidente() { return dataIncidente; }
+    public void setDataIncidente(LocalDateTime dataIncidente) { this.dataIncidente = dataIncidente; }
+
     public String getDescricao() { return descricao; }
+    public void setDescricao(String descricao) { this.descricao = descricao; }
+
     public String getGravidade() { return gravidade; }
+    public void setGravidade(String gravidade) { this.gravidade = gravidade; }
+
     public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 }

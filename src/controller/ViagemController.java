@@ -33,4 +33,12 @@ public class ViagemController {
         boolean sucesso = viagemDAO.salvar(viagem);
         return sucesso ? "OK" : "Erro ao salvar a viagem no banco de dados.";
     }
+
+    // MÉTODO NOVO NO CONTROLLER
+    public boolean excluirViagem(int idViagem) {
+        if (idViagem <= 0) {
+            return false;
+        }
+        return viagemDAO.excluirViagem(idViagem);
+    }
 }

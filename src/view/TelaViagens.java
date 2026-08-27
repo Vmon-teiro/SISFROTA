@@ -85,20 +85,28 @@ public class TelaViagens extends JFrame {
         add(pnlForm, BorderLayout.NORTH);
 
         // Tabela Central
-        modelTabela = new DefaultTableModel(new String[]{"ID", "Embarcação", "Comandante", "Destino", "Passageiros", "Partida", "Chegada", "Status"}, 0);
+        modelTabela = new DefaultTableModel(new String[]{"ID", "Embarcação", "Comandante", "Destino", "Passageiros", "Partida", "Chegada", "Status"}, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
         tabelaViagens = new JTable(modelTabela);
         add(new JScrollPane(tabelaViagens), BorderLayout.CENTER);
 
         // Ações da Tabela
-        JPanel pnlAcoes = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JPanel pnlAcoes = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
         JButton btnConcluir = new JButton("Concluir Viagem Selecionada");
         JButton btnCancelar = new JButton("Cancelar Viagem");
+        JButton btnExcluir = new JButton("Excluir Viagem");
 
         btnConcluir.addActionListener(e -> alterarStatusViagem(true));
         btnCancelar.addActionListener(e -> alterarStatusViagem(false));
+        btnExcluir.addActionListener(e -> excluirViagem());
 
         pnlAcoes.add(btnConcluir);
         pnlAcoes.add(btnCancelar);
+        pnlAcoes.add(btnExcluir);
         add(pnlAcoes, BorderLayout.SOUTH);
 
         carregarCombos();
@@ -145,7 +153,6 @@ public class TelaViagens extends JFrame {
 
             int passageiros = Integer.parseInt(txtPassageiros.getText().trim());
 
-            // Converte os valores dos seletores para LocalDateTime
             Date dateData = (Date) spDataPartida.getValue();
             Date dateHora = (Date) spHorarioPartida.getValue();
 
@@ -195,6 +202,38 @@ public class TelaViagens extends JFrame {
             atualizarTabela();
         } else {
             JOptionPane.showMessageDialog(this, "Erro ao atualizar a viagem no banco.");
+        }
+    }
+
+    // MÉTODO NOVO PARA EXCLUIR REGISTRO
+    private void excluirViagem() {
+        int linha = tabelaViagens.getSelectedRow();
+        if (linha == -1) {
+            JOptionPane.showMessageDialog(this, "Selecione uma viagem na tabela para excluir.", "Aviso", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        int idViagem = (int) modelTabela.getValueAt(linha, 0);
+
+        int confirmacao = JOptionPane.showConfirmDialog(
+            this,
+            "Tem certeza que deseja excluir permanentemente a viagem ID " + idViagem + "?",
+            "Confirmar Exclusão",
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.WARNING_MESSAGE
+        );
+
+        if (confirmacao == JOptionPane.YES_OPTION) {
+            boolean ok = controller.excluirViagem(idViagem);
+            if (ok) {
+                JOptionPane.showMessageDialog(this, "Viagem excluída com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+                atualizarTabela();
+            } else {
+                JOptionPane.showMessageDialog(this, 
+                    "Erro ao excluir a viagem.\nVerifique se existem incidentes ou outros registros vinculados a esta viagem.", 
+                    "Erro de Integridade", 
+                    JOptionPane.ERROR_MESSAGE);
+            }
         }
     }
 }
