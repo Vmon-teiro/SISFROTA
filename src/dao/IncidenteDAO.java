@@ -2,6 +2,7 @@ package dao;
 
 import model.Incidente;
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -61,6 +62,39 @@ public class IncidenteDAO {
         return lista;
     }
 
+    /**
+     * Retorna todos os incidentes formatados em array de objetos pronto para preencher tabelas.
+     */
+    public List<Object[]> listarTodosParaTabela() {
+        List<Object[]> lista = new ArrayList<>();
+        String sql = "SELECT i.id, e.nome AS embarcacao, i.data_incidente, i.descricao, i.gravidade, i.status " +
+                     "FROM incidentes i " +
+                     "LEFT JOIN embarcacoes e ON i.id_embarcacao = e.id " +
+                     "ORDER BY i.id DESC";
+
+        try (Connection conn = ConexaoDAO.obterConexao();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                Timestamp ts = rs.getTimestamp("data_incidente");
+                LocalDateTime dataHora = (ts != null) ? ts.toLocalDateTime() : null;
+
+                lista.add(new Object[]{
+                    rs.getInt("id"),
+                    rs.getString("embarcacao") != null ? rs.getString("embarcacao") : "N/I",
+                    dataHora,
+                    rs.getString("descricao"),
+                    rs.getString("gravidade"),
+                    rs.getString("status") != null ? rs.getString("status") : "PENDENTE"
+                });
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return lista;
+    }
+
     public boolean atualizarStatus(int idIncidente, String novoStatus) {
         String sql = "UPDATE incidentes SET status = ? WHERE id = ?";
         try (Connection conn = ConexaoDAO.obterConexao();
@@ -74,4 +108,18 @@ public class IncidenteDAO {
             return false;
         }
     }
+
+    public boolean excluir(int idIncidente) {
+       String sql = "DELETE FROM incidentes WHERE id = ?";
+       try (Connection conn = ConexaoDAO.obterConexao();
+            PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+           stmt.setInt(1, idIncidente);
+           return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+    }
+ }
+
 }

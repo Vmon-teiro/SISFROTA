@@ -66,6 +66,18 @@ public class AbastecimentoDAO {
         return 0.0;
     }
 
+    public boolean excluir(int idAbastecimento) {
+    String sql = "DELETE FROM abastecimento WHERE id = ?";
+    try (Connection conn = ConexaoDAO.obterConexao();
+         PreparedStatement stmt = conn.prepareStatement(sql)) {
+        stmt.setInt(1, idAbastecimento);
+        return stmt.executeUpdate() > 0;
+    } catch (SQLException e) {
+        e.printStackTrace();
+        return false;
+    }
+}
+
     public static class AbastecimentoDTO {
         private final int id;
         private final String nomeEmbarcacao;

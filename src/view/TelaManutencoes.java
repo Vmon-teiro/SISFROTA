@@ -17,6 +17,10 @@ public class TelaManutencoes extends JFrame {
     private DefaultTableModel modelIncidentes;
     private DefaultTableModel modelManutencoes;
 
+    // Componentes para exibição de detalhes expansíveis
+    private JTextArea txtDetalheIncidente;
+    private JTextArea txtDetalheOS;
+
     private JComboBox<Embarcacao> cbEmbarcacoes;
     private JComboBox<String> cbTipo;
     private JTextArea txtDescricao;
@@ -26,7 +30,7 @@ public class TelaManutencoes extends JFrame {
 
     public TelaManutencoes() {
         setTitle("Gestão de Manutenções, Preventivas e Incidentes (ADM)");
-        setSize(1000, 650);
+        setSize(1000, 700);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 
@@ -52,7 +56,42 @@ public class TelaManutencoes extends JFrame {
         tblIncidentes.getColumnModel().getColumn(6).setMaxWidth(0);
         tblIncidentes.getColumnModel().getColumn(6).setWidth(0);
 
-        panel.add(new JScrollPane(tblIncidentes), BorderLayout.CENTER);
+        JScrollPane scrollTabela = new JScrollPane(tblIncidentes);
+
+        // Painel de Detalhes do Incidente
+        JPanel pnlDetalhes = new JPanel(new BorderLayout());
+        pnlDetalhes.setBorder(BorderFactory.createTitledBorder(" Detalhes do Incidente Selecionado "));
+
+        txtDetalheIncidente = new JTextArea(4, 50);
+        txtDetalheIncidente.setEditable(false);
+        txtDetalheIncidente.setLineWrap(true);
+        txtDetalheIncidente.setWrapStyleWord(true);
+        txtDetalheIncidente.setBackground(new Color(245, 245, 245));
+        txtDetalheIncidente.setFont(new Font("Monospaced", Font.PLAIN, 12));
+        pnlDetalhes.add(new JScrollPane(txtDetalheIncidente), BorderLayout.CENTER);
+
+        tblIncidentes.getSelectionModel().addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting()) {
+                int row = tblIncidentes.getSelectedRow();
+                if (row != -1) {
+                    txtDetalheIncidente.setText(
+                        "ID INCIDENTE : " + modelIncidentes.getValueAt(row, 0) + "\n" +
+                        "EMBARCAÇÃO  : " + modelIncidentes.getValueAt(row, 1) + "\n" +
+                        "DATA/HORA   : " + modelIncidentes.getValueAt(row, 2) + "\n" +
+                        "GRAVIDADE   : " + modelIncidentes.getValueAt(row, 4) + "\n" +
+                        "STATUS      : " + modelIncidentes.getValueAt(row, 5) + "\n" +
+                        "----------------------------------------------------------------------\n" +
+                        "DESCRIÇÃO COMPLETA:\n" + modelIncidentes.getValueAt(row, 3)
+                    );
+                    txtDetalheIncidente.setCaretPosition(0);
+                }
+            }
+        });
+
+        JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, scrollTabela, pnlDetalhes);
+        splitPane.setResizeWeight(0.65);
+
+        panel.add(splitPane, BorderLayout.CENTER);
 
         JPanel pnlAcoes = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         JButton btnGerarOS = new JButton("Aprovar e Gerar Ordem de Serviço (OS)");
@@ -111,7 +150,45 @@ public class TelaManutencoes extends JFrame {
             @Override public boolean isCellEditable(int r, int c) { return false; }
         };
         tblManutencoes = new JTable(modelManutencoes);
-        panel.add(new JScrollPane(tblManutencoes), BorderLayout.CENTER);
+
+        JScrollPane scrollTabela = new JScrollPane(tblManutencoes);
+
+        // Painel de Detalhes da Ordem de Serviço
+        JPanel pnlDetalhesOS = new JPanel(new BorderLayout());
+        pnlDetalhesOS.setBorder(BorderFactory.createTitledBorder(" Detalhes da Ordem de Serviço Selecionada "));
+
+        txtDetalheOS = new JTextArea(4, 50);
+        txtDetalheOS.setEditable(false);
+        txtDetalheOS.setLineWrap(true);
+        txtDetalheOS.setWrapStyleWord(true);
+        txtDetalheOS.setBackground(new Color(245, 245, 245));
+        txtDetalheOS.setFont(new Font("Monospaced", Font.PLAIN, 12));
+        pnlDetalhesOS.add(new JScrollPane(txtDetalheOS), BorderLayout.CENTER);
+
+        tblManutencoes.getSelectionModel().addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting()) {
+                int row = tblManutencoes.getSelectedRow();
+                if (row != -1) {
+                    txtDetalheOS.setText(
+                        "ID OS               : " + modelManutencoes.getValueAt(row, 0) + "\n" +
+                        "EMBARCAÇÃO          : " + modelManutencoes.getValueAt(row, 1) + "\n" +
+                        "TIPO MANUTENÇÃO     : " + modelManutencoes.getValueAt(row, 2) + "\n" +
+                        "HORÍMETRO META      : " + modelManutencoes.getValueAt(row, 4) + "\n" +
+                        "DATA AGENDADA       : " + modelManutencoes.getValueAt(row, 5) + "\n" +
+                        "CUSTO ESTIMADO (R$) : " + modelManutencoes.getValueAt(row, 6) + "\n" +
+                        "STATUS              : " + modelManutencoes.getValueAt(row, 7) + "\n" +
+                        "----------------------------------------------------------------------\n" +
+                        "DESCRIÇÃO DO SERVIÇO:\n" + modelManutencoes.getValueAt(row, 3)
+                    );
+                    txtDetalheOS.setCaretPosition(0);
+                }
+            }
+        });
+
+        JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, scrollTabela, pnlDetalhesOS);
+        splitPane.setResizeWeight(0.55);
+
+        panel.add(splitPane, BorderLayout.CENTER);
 
         JPanel pnlStatus = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         JButton btnEmAndamento = new JButton("Marcar 'EM ANDAMENTO'");
@@ -140,6 +217,9 @@ public class TelaManutencoes extends JFrame {
         for (Object[] row : controller.obterManutencoes()) {
             modelManutencoes.addRow(row);
         }
+
+        if (txtDetalheIncidente != null) txtDetalheIncidente.setText("");
+        if (txtDetalheOS != null) txtDetalheOS.setText("");
     }
 
     private void aprovarEGerarOS() {

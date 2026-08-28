@@ -74,15 +74,11 @@ public class TelaPrincipal extends JFrame {
                 panelMenu.add(criarBotaoMenu("Gerenciar Embarcações", e -> new TelaGerenciarEmbarcacoes().setVisible(true)));
                 panelMenu.add(criarBotaoMenu("Manutenções e Preventivas", e -> new TelaManutencoes().setVisible(true)));
                 panelMenu.add(criarBotaoMenu("Gerenciar Tripulação", e -> new TelaGerenciarTripulacao().setVisible(true)));
-                panelMenu.add(criarBotaoMenu("Registrar Abastecimento", e -> new TelaAbastecimento().setVisible(true)));
                 panelMenu.add(criarBotaoMenu("Relatórios de Custos (PDF)", e -> new TelaRelatorioCustos().setVisible(true)));
                 break;
 
             case "OPERADOR":
-                panelMenu.add(criarBotaoMenu("Registrar Viagem", e -> new TelaViagens().setVisible(true)));
-                panelMenu.add(criarBotaoMenu("Registrar Abastecimento", e -> new TelaAbastecimento().setVisible(true)));
-                panelMenu.add(criarBotaoMenu("Registrar Incidente", e -> new TelaIncidente().setVisible(true)));
-                panelMenu.add(criarBotaoMenu("Consultar Horários", e -> new TelaConsultaHorarios().setVisible(true)));
+                panelMenu.add(criarBotaoMenu("Painel Operacional Integrado", e -> new TelaDashboardOperador().setVisible(true)));
                 break;
 
             case "TECNICO":
