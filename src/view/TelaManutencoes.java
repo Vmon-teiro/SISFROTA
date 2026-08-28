@@ -1,185 +1,204 @@
 package view;
 
-import controller.EmbarcacaoController;
 import controller.ManutencaoController;
+import dao.EmbarcacaoDAO;
 import model.Embarcacao;
-import model.Manutencao;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.sql.Date;
-import java.util.List;
 
 public class TelaManutencoes extends JFrame {
 
-    private final ManutencaoController controller;
-    private final EmbarcacaoController embarcacaoController;
-    private JTable tabela;
-    private DefaultTableModel tableModel;
-    private JComboBox<String> cbEmbarcacoes, cbTipo, cbStatus;
-    private JTextField txtDescricao, txtHorimetro, txtDataAgendamento;
-    private JTextField txtDataExecucao, txtCustoTotal;
-    private List<Embarcacao> listaEmbarcacoes;
-    private List<Manutencao> listaManutencoes;
+    private final ManutencaoController controller = new ManutencaoController();
+    private JTable tblIncidentes;
+    private JTable tblManutencoes;
+    private DefaultTableModel modelIncidentes;
+    private DefaultTableModel modelManutencoes;
+
+    private JComboBox<Embarcacao> cbEmbarcacoes;
+    private JComboBox<String> cbTipo;
+    private JTextArea txtDescricao;
+    private JTextField txtHorimetro;
+    private JSpinner spDataAgendamento;
+    private JTextField txtCusto;
 
     public TelaManutencoes() {
-        controller = new ManutencaoController();
-        embarcacaoController = new EmbarcacaoController();
-        setTitle("Gestão Náutica - Ordens de Serviço e Manutenções");
-        setSize(900, 600);
+        setTitle("Gestão de Manutenções, Preventivas e Incidentes (ADM)");
+        setSize(1000, 650);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
-        initComponentes();
-        carregarEmbarcacoes();
-        carregarTabela();
+
+        JTabbedPane tabbedPane = new JTabbedPane();
+        tabbedPane.addTab("Central de Incidentes (Operadores)", criarPainelIncidentes());
+        tabbedPane.addTab("Ordens de Serviço e Agendamentos", criarPainelManutencoes());
+
+        add(tabbedPane);
+        carregarDados();
     }
 
-    private void initComponentes() {
-        setLayout(new BorderLayout(10, 10));
+    private JPanel criarPainelIncidentes() {
+        JPanel panel = new JPanel(new BorderLayout(10, 10));
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        // Formulário Superior: Agendar / Abrir O.S.
-        JPanel panelForm = new JPanel(new GridLayout(4, 3, 10, 10));
-        panelForm.setBorder(BorderFactory.createTitledBorder(" Nova Ordem de Serviço / Agendamento "));
-        
-        panelForm.add(new JLabel("Embarcação:"));
-        cbEmbarcacoes = new JComboBox<>();
-        panelForm.add(cbEmbarcacoes);
-
-        panelForm.add(new JLabel("Tipo:"));
-        cbTipo = new JComboBox<>(new String[]{"PREVENTIVA", "CORRETIVA"});
-        panelForm.add(cbTipo);
-
-        panelForm.add(new JLabel("Descrição do Serviço:"));
-        txtDescricao = new JTextField();
-        panelForm.add(txtDescricao);
-
-        panelForm.add(new JLabel("Horímetro Limite (h):"));
-        txtHorimetro = new JTextField();
-        panelForm.add(txtHorimetro);
-
-        panelForm.add(new JLabel("Data Agendamento (AAAA-MM-DD):"));
-        txtDataAgendamento = new JTextField();
-        panelForm.add(txtDataAgendamento);
-
-        panelForm.add(new JLabel("Status Inicial:"));
-        cbStatus = new JComboBox<>(new String[]{"AGENDADA", "EM_ANDAMENTO"});
-        panelForm.add(cbStatus);
-
-        JButton btnAgendar = new JButton("Salvar Ordem de Serviço");
-        btnAgendar.addActionListener(e -> agendarManutencao());
-        panelForm.add(btnAgendar);
-
-        add(panelForm, BorderLayout.NORTH);
-
-        // Tabela Central: Listagem
-        String[] colunas = {"ID", "Embarcação", "Tipo", "Descrição", "Horímetro", "Data Agendada", "Custo (R$)", "Status"};
-        tableModel = new DefaultTableModel(colunas, 0) {
-            @Override
-            public boolean isCellEditable(int row, int column) { return false; }
+        modelIncidentes = new DefaultTableModel(new String[]{"ID", "Embarcação", "Data Incidente", "Descrição", "Gravidade", "Status", "ID_EMB"}, 0) {
+            @Override public boolean isCellEditable(int r, int c) { return false; }
         };
-        tabela = new JTable(tableModel);
-        add(new JScrollPane(tabela), BorderLayout.CENTER);
+        tblIncidentes = new JTable(modelIncidentes);
+        
+        // Esconde a coluna ID_EMB que guarda a chave estrangeira
+        tblIncidentes.getColumnModel().getColumn(6).setMinWidth(0);
+        tblIncidentes.getColumnModel().getColumn(6).setMaxWidth(0);
+        tblIncidentes.getColumnModel().getColumn(6).setWidth(0);
 
-        // Painel Inferior: Baixa / Conclusão de O.S. (Funcionalidade Técnica)
-        JPanel panelBaixa = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10));
-        panelBaixa.setBorder(BorderFactory.createTitledBorder(" Encerrar / Dar Baixa em O.S. Selecionada "));
+        panel.add(new JScrollPane(tblIncidentes), BorderLayout.CENTER);
 
-        panelBaixa.add(new JLabel("Data Execução (AAAA-MM-DD):"));
-        txtDataExecucao = new JTextField(10);
-        panelBaixa.add(txtDataExecucao);
+        JPanel pnlAcoes = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JButton btnGerarOS = new JButton("Aprovar e Gerar Ordem de Serviço (OS)");
+        btnGerarOS.setBackground(new Color(41, 128, 185));
+        btnGerarOS.setForeground(Color.WHITE);
 
-        panelBaixa.add(new JLabel("Custo Total (R$):"));
-        txtCustoTotal = new JTextField(8);
-        panelBaixa.add(txtCustoTotal);
+        btnGerarOS.addActionListener(e -> aprovarEGerarOS());
+        pnlAcoes.add(btnGerarOS);
+        panel.add(pnlAcoes, BorderLayout.SOUTH);
 
-        JButton btnConcluir = new JButton("Concluir Manutenção");
-        btnConcluir.addActionListener(e -> concluirManutencao());
-        panelBaixa.add(btnConcluir);
-
-        add(panelBaixa, BorderLayout.SOUTH);
+        return panel;
     }
 
-    private void carregarEmbarcacoes() {
+    private JPanel criarPainelManutencoes() {
+        JPanel panel = new JPanel(new BorderLayout(10, 10));
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        JPanel pnlForm = new JPanel(new GridBagLayout());
+        pnlForm.setBorder(BorderFactory.createTitledBorder(" Nova Ordem de Serviço / Agendamento "));
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(4, 4, 4, 4);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+
+        gbc.gridx = 0; gbc.gridy = 0; pnlForm.add(new JLabel("Embarcação:"), gbc);
+        gbc.gridx = 1; cbEmbarcacoes = new JComboBox<>(); pnlForm.add(cbEmbarcacoes, gbc);
+
+        gbc.gridx = 2; gbc.gridy = 0; pnlForm.add(new JLabel("Tipo:"), gbc);
+        gbc.gridx = 3; cbTipo = new JComboBox<>(new String[]{"PREVENTIVA", "CORRETIVA"}); pnlForm.add(cbTipo, gbc);
+
+        gbc.gridx = 0; gbc.gridy = 1; pnlForm.add(new JLabel("Descrição Serviço:"), gbc);
+        gbc.gridx = 1; gbc.gridwidth = 3;
+        txtDescricao = new JTextArea(2, 20);
+        pnlForm.add(new JScrollPane(txtDescricao), gbc);
+        gbc.gridwidth = 1;
+
+        gbc.gridx = 0; gbc.gridy = 2; pnlForm.add(new JLabel("Horímetro Meta:"), gbc);
+        gbc.gridx = 1; txtHorimetro = new JTextField(); pnlForm.add(txtHorimetro, gbc);
+
+        gbc.gridx = 2; gbc.gridy = 2; pnlForm.add(new JLabel("Data Agendada:"), gbc);
+        gbc.gridx = 3;
+        spDataAgendamento = new JSpinner(new SpinnerDateModel());
+        spDataAgendamento.setEditor(new JSpinner.DateEditor(spDataAgendamento, "dd/MM/yyyy"));
+        pnlForm.add(spDataAgendamento, gbc);
+
+        gbc.gridx = 0; gbc.gridy = 3; pnlForm.add(new JLabel("Custo Estimado (R$):"), gbc);
+        gbc.gridx = 1; txtCusto = new JTextField("0.00"); pnlForm.add(txtCusto, gbc);
+
+        gbc.gridx = 3; gbc.gridy = 3;
+        JButton btnSalvar = new JButton("Encaminhar para Técnico");
+        btnSalvar.addActionListener(e -> salvarManutencao());
+        pnlForm.add(btnSalvar, gbc);
+
+        panel.add(pnlForm, BorderLayout.NORTH);
+
+        modelManutencoes = new DefaultTableModel(new String[]{"ID", "Embarcação", "Tipo", "Descrição", "Horímetro", "Data Agendada", "Custo (R$)", "Status"}, 0) {
+            @Override public boolean isCellEditable(int r, int c) { return false; }
+        };
+        tblManutencoes = new JTable(modelManutencoes);
+        panel.add(new JScrollPane(tblManutencoes), BorderLayout.CENTER);
+
+        JPanel pnlStatus = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JButton btnEmAndamento = new JButton("Marcar 'EM ANDAMENTO'");
+        JButton btnCancelar = new JButton("Cancelar OS");
+
+        btnEmAndamento.addActionListener(e -> alterarStatusOS("EM_ANDAMENTO"));
+        btnCancelar.addActionListener(e -> alterarStatusOS("CANCELADA"));
+
+        pnlStatus.add(btnEmAndamento);
+        pnlStatus.add(btnCancelar);
+        panel.add(pnlStatus, BorderLayout.SOUTH);
+
+        return panel;
+    }
+
+    private void carregarDados() {
         cbEmbarcacoes.removeAllItems();
-        listaEmbarcacoes = embarcacaoController.listarTodas();
-        for (Embarcacao emb : listaEmbarcacoes) {
-            cbEmbarcacoes.addItem(emb.getNome() + " (" + emb.getModelo() + ")");
+        new EmbarcacaoDAO().listarTodas().forEach(cbEmbarcacoes::addItem);
+
+        modelIncidentes.setRowCount(0);
+        for (Object[] row : controller.obterIncidentesPendentes()) {
+            modelIncidentes.addRow(row);
+        }
+
+        modelManutencoes.setRowCount(0);
+        for (Object[] row : controller.obterManutencoes()) {
+            modelManutencoes.addRow(row);
         }
     }
 
-    private void carregarTabela() {
-        tableModel.setRowCount(0);
-        listaManutencoes = controller.listarTodas();
-        for (Manutencao m : listaManutencoes) {
-            tableModel.addRow(new Object[]{
-                m.getId(),
-                m.getNomeEmbarcacao(),
-                m.getTipoManutencao(),
-                m.getDescricaoServico(),
-                m.getHorimetroAgendado() != null ? m.getHorimetroAgendado() + " h" : "N/A",
-                m.getDataAgendamento(),
-                String.format("R$ %.2f", m.getCustoTotal()),
-                m.getStatus()
-            });
-        }
-    }
-
-    private void agendarManutencao() {
-        int indexEmb = cbEmbarcacoes.getSelectedIndex();
-        if (indexEmb < 0) {
-            JOptionPane.showMessageDialog(this, "Selecione uma embarcação válida.", "Erro", JOptionPane.ERROR_MESSAGE);
+    private void aprovarEGerarOS() {
+        int row = tblIncidentes.getSelectedRow();
+        if (row == -1) {
+            JOptionPane.showMessageDialog(this, "Selecione um incidente na tabela para aprovação.");
             return;
         }
-        int idEmbarcacao = listaEmbarcacoes.get(indexEmb).getId();
-        String tipo = (String) cbTipo.getSelectedItem();
-        String descricao = txtDescricao.getText();
-        String dataStr = txtDataAgendamento.getText();
-        String status = (String) cbStatus.getSelectedItem();
-        Integer horimetro = null;
 
-        if (!txtHorimetro.getText().trim().isEmpty()) {
-            try {
-                horimetro = Integer.parseInt(txtHorimetro.getText().trim());
-            } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(this, "Horímetro deve ser um número inteiro.", "Erro", JOptionPane.WARNING_MESSAGE);
-                return;
-            }
-        }
+        int idIncidente = (int) modelIncidentes.getValueAt(row, 0);
+        String desc = (String) modelIncidentes.getValueAt(row, 3);
+        int idEmbarcacao = (int) modelIncidentes.getValueAt(row, 6);
 
-        if (controller.agendar(idEmbarcacao, tipo, descricao, horimetro, dataStr, status)) {
-            JOptionPane.showMessageDialog(this, "Manutenção agendada com sucesso!");
-            txtDescricao.setText("");
-            txtHorimetro.setText("");
-            txtDataAgendamento.setText("");
-            carregarTabela();
+        Date dataHoje = new Date(System.currentTimeMillis());
+        boolean ok = controller.converterIncidenteEmOS(idIncidente, idEmbarcacao, desc, dataHoje);
+
+        if (ok) {
+            JOptionPane.showMessageDialog(this, "Ordem de Serviço gerada e encaminhada ao Técnico!");
+            carregarDados();
         } else {
-            JOptionPane.showMessageDialog(this, "Erro ao agendar. Verifique a data (AAAA-MM-DD).", "Erro", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Erro ao converter incidente em OS.", "Erro", JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    private void concluirManutencao() {
-        int linhaSelecionada = tabela.getSelectedRow();
-        if (linhaSelecionada < 0) {
-            JOptionPane.showMessageDialog(this, "Selecione uma manutenção na tabela para concluir.", "Aviso", JOptionPane.WARNING_MESSAGE);
+    private void salvarManutencao() {
+        try {
+            Embarcacao emb = (Embarcacao) cbEmbarcacoes.getSelectedItem();
+            String tipo = (String) cbTipo.getSelectedItem();
+            String desc = txtDescricao.getText();
+            Integer horimetro = txtHorimetro.getText().trim().isEmpty() ? null : Integer.parseInt(txtHorimetro.getText().trim());
+            java.util.Date d = (java.util.Date) spDataAgendamento.getValue();
+            Date dataAgendada = new Date(d.getTime());
+            double custo = Double.parseDouble(txtCusto.getText().replace(",", "."));
+
+            String res = controller.criarOrdemServico(emb.getId(), tipo, desc, horimetro, dataAgendada, custo);
+            if ("OK".equals(res)) {
+                JOptionPane.showMessageDialog(this, "OS registrada e enviada para o painel do Técnico!");
+                txtDescricao.setText("");
+                txtHorimetro.setText("");
+                txtCusto.setText("0.00");
+                carregarDados();
+            } else {
+                JOptionPane.showMessageDialog(this, res, "Aviso", JOptionPane.WARNING_MESSAGE);
+            }
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Verifique os campos numéricos e datas.", "Erro", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void alterarStatusOS(String novoStatus) {
+        int row = tblManutencoes.getSelectedRow();
+        if (row == -1) {
+            JOptionPane.showMessageDialog(this, "Selecione uma manutenção na tabela.");
             return;
         }
-
-        try {
-            int idManutencao = (int) tableModel.getValueAt(linhaSelecionada, 0);
-            Date dataExec = Date.valueOf(txtDataExecucao.getText().trim());
-            double custo = Double.parseDouble(txtCustoTotal.getText().trim());
-
-            if (controller.concluirManutencao(idManutencao, dataExec, custo)) {
-                JOptionPane.showMessageDialog(this, "Ordem de Serviço concluída com sucesso!");
-                txtDataExecucao.setText("");
-                txtCustoTotal.setText("");
-                carregarTabela();
-            } else {
-                JOptionPane.showMessageDialog(this, "Não foi possível concluir a O.S.", "Erro", JOptionPane.ERROR_MESSAGE);
-            }
-        } catch (IllegalArgumentException ex) {
-            JOptionPane.showMessageDialog(this, "Informe a data no formato AAAA-MM-DD e um custo válido.", "Erro de Validação", JOptionPane.WARNING_MESSAGE);
+        int id = (int) modelManutencoes.getValueAt(row, 0);
+        if (controller.atualizarStatusOS(id, novoStatus)) {
+            JOptionPane.showMessageDialog(this, "Status atualizado!");
+            carregarDados();
         }
     }
 }

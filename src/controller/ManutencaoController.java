@@ -1,58 +1,46 @@
 package controller;
 
-import dao.EmbarcacaoDAO;
+import dao.IncidenteDAO;
 import dao.ManutencaoDAO;
-import model.Embarcacao;
-import model.Manutencao;
 
 import java.sql.Date;
 import java.util.List;
 
 public class ManutencaoController {
 
-    private ManutencaoDAO manutencaoDAO;
-    private EmbarcacaoDAO embarcacaoDAO;
+    private final ManutencaoDAO manutencaoDAO = new ManutencaoDAO();
+    private final IncidenteDAO incidenteDAO = new IncidenteDAO();
 
-    public ManutencaoController() {
-        this.manutencaoDAO = new ManutencaoDAO();
-        this.embarcacaoDAO = new EmbarcacaoDAO();
+    public List<Object[]> obterIncidentesPendentes() {
+        return incidenteDAO.listarIncidentesPendentes();
     }
 
-    public boolean agendar(int idEmbarcacao, String tipo, String descricao, Integer horimetro, String dataStr, String status) {
-        try {
-            if (descricao == null || descricao.trim().isEmpty() || dataStr == null || dataStr.trim().isEmpty()) {
-                return false;
-            }
+    public List<Object[]> obterManutencoes() {
+        return manutencaoDAO.listarTodasManutencoes();
+    }
 
-            Embarcacao emb = embarcacaoDAO.buscarPorId(idEmbarcacao);
-            if (emb == null) {
-                System.err.println("Embarcação não encontrada.");
-                return false;
-            }
-
-            Date dataAgendamento = Date.valueOf(dataStr.trim());
-
-            Manutencao m = new Manutencao();
-            m.setIdEmbarcacao(idEmbarcacao);
-            m.setTipoManutencao(tipo);
-            m.setDescricaoServico(descricao);
-            m.setHorimetroAgendado(horimetro);
-            m.setDataAgendamento(dataAgendamento);
-            m.setStatus(status);
-
-            return manutencaoDAO.cadastrar(m);
-        } catch (Exception e) {
-            System.err.println("Erro no agendamento: " + e.getMessage());
-            return false;
+    public String criarOrdemServico(int idEmbarcacao, String tipo, String descricao, Integer horimetro, Date dataAgendada, double custo) {
+        if (descricao == null || descricao.trim().isEmpty()) {
+            return "A descrição do serviço é obrigatória.";
         }
+        if (dataAgendada == null) {
+            return "A data de agendamento é obrigatória.";
+        }
+
+        boolean ok = manutencaoDAO.salvar(idEmbarcacao, tipo, descricao, horimetro, dataAgendada, custo);
+        return ok ? "OK" : "Erro ao registrar ordem de serviço no banco de dados.";
     }
 
-    public List<Manutencao> listarTodas() {
-        return manutencaoDAO.listarTodas();
+    public boolean converterIncidenteEmOS(int idIncidente, int idEmbarcacao, String descricao, Date dataAgendada) {
+        boolean osCriada = manutencaoDAO.salvar(idEmbarcacao, "CORRETIVA", "OS Originada do Incidente #" + idIncidente + ": " + descricao, null, dataAgendada, 0.0);
+        if (osCriada) {
+            incidenteDAO.atualizarStatus(idIncidente, "EM_ANALISE");
+            return true;
+        }
+        return false;
     }
 
-    public boolean concluirManutencao(int id, Date dataExecucao, double custoTotal) {
-        if (custoTotal < 0) return false;
-        return manutencaoDAO.concluirManutencao(id, dataExecucao, custoTotal);
+    public boolean atualizarStatusOS(int idManutencao, String status) {
+        return manutencaoDAO.alterarStatus(idManutencao, status);
     }
 }

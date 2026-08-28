@@ -71,12 +71,11 @@ public class TelaPrincipal extends JFrame {
 
         switch (perfil) {
             case "ADMINISTRADOR":
-                panelMenu.add(criarBotaoMenu("Dashboard / Indicadores", e -> new TelaDashboardAdmin().setVisible(true)));
-                panelMenu.add(criarBotaoMenu("Gerenciar Embarcações", e -> new TelaEmbarcacoes().setVisible(true)));
+                panelMenu.add(criarBotaoMenu("Gerenciar Embarcações", e -> new TelaGerenciarEmbarcacoes().setVisible(true)));
                 panelMenu.add(criarBotaoMenu("Manutenções e Preventivas", e -> new TelaManutencoes().setVisible(true)));
-                panelMenu.add(criarBotaoMenu("Gerenciar Tripulação", e -> new TelaTripulantes().setVisible(true)));
+                panelMenu.add(criarBotaoMenu("Gerenciar Tripulação", e -> new TelaGerenciarTripulacao().setVisible(true)));
                 panelMenu.add(criarBotaoMenu("Registrar Abastecimento", e -> new TelaAbastecimento().setVisible(true)));
-                panelMenu.add(criarBotaoMenu("Relatórios de Custos (PDF)", e -> new TelaRelatorios().setVisible(true)));
+                panelMenu.add(criarBotaoMenu("Relatórios de Custos (PDF)", e -> new TelaRelatorioCustos().setVisible(true)));
                 break;
 
             case "OPERADOR":
@@ -87,14 +86,9 @@ public class TelaPrincipal extends JFrame {
                 break;
 
             case "TECNICO":
-                panelMenu.add(criarBotaoMenu("Ordens de Serviço / Manutenção", e -> new TelaManutencoes().setVisible(true)));
-                panelMenu.add(criarBotaoMenu("Agendar Revisão", e -> new TelaManutencoes().setVisible(true)));
-                panelMenu.add(criarBotaoMenu("Alertas de Horímetro", e -> 
-                    JOptionPane.showMessageDialog(this, "Tela de Alertas em desenvolvimento.", "Aviso", JOptionPane.INFORMATION_MESSAGE)));
-                panelMenu.add(criarBotaoMenu("Histórico de Motores", e -> 
-                    JOptionPane.showMessageDialog(this, "Histórico em desenvolvimento.", "Aviso", JOptionPane.INFORMATION_MESSAGE)));
+                panelMenu.add(criarBotaoMenu("Serviços Gerais", e -> new TelaDashboardTecnico().setVisible(true)));
                 break;
-
+                
             default:
                 JOptionPane.showMessageDialog(this, "Perfil de usuário não reconhecido.", "Erro de Permissão", JOptionPane.ERROR_MESSAGE);
                 break;
