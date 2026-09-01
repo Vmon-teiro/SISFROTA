@@ -32,8 +32,8 @@ CREATE TABLE usuarios (
     nome VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
     senha VARCHAR(255) NOT NULL,
-    perfil ENUM('ADMINISTRADOR', 'OPERADOR', 'TECNICO') NOT NULL,
-    status ENUM('ATIVO', 'INATIVO') DEFAULT 'ATIVO',
+    perfil ENUM('ADMINISTRADOR','OPERADOR','TECNICO') NOT NULL,
+    status ENUM('ATIVO','INATIVO') DEFAULT 'ATIVO',
     data_criacao DATETIME DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
 
@@ -48,7 +48,7 @@ CREATE TABLE embarcacoes (
     capacidade_carga_ton DECIMAL(8,2) DEFAULT 0.00,
     ano_fabricacao INT NOT NULL,
     horimetro_horas INT NOT NULL DEFAULT 0,
-    status ENUM('ATIVA', 'EM_MANUTENCAO', 'INATIVA') DEFAULT 'ATIVA',
+    status ENUM('ATIVA','EM_MANUTENCAO','INATIVA') DEFAULT 'ATIVA',
     data_cadastro DATETIME DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
 
@@ -59,10 +59,10 @@ CREATE TABLE tripulantes (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
     cpf VARCHAR(14) NOT NULL UNIQUE,
-    categoria_habilitacao ENUM('PILOTO_FLUVIAL', 'CONDUTOR_FLUVIAL', 'ARRAIS_AMADOR', 'MESTRE_AMADOR', 'CAPITAO_AMADOR') NOT NULL,
+    categoria_habilitacao ENUM('PILOTO_FLUVIAL','CONDUTOR_FLUVIAL','ARRAIS_AMADOR','MESTRE_AMADOR','CAPITAO_AMADOR') NOT NULL,
     numero_registro_cir VARCHAR(30) NOT NULL UNIQUE,
     data_vencimento_cir DATE NOT NULL,
-    status ENUM('DISPONIVEL', 'EM_VIAGEM', 'INATIVO') DEFAULT 'DISPONIVEL'
+    status ENUM('DISPONIVEL','EM_VIAGEM','INATIVO') DEFAULT 'DISPONIVEL'
 ) ENGINE=InnoDB;
 
 -- ------------------------------------------------------------
@@ -87,11 +87,11 @@ CREATE TABLE fornecedores (
 CREATE TABLE documentos_embarcacao (
     id INT AUTO_INCREMENT PRIMARY KEY,
     id_embarcacao INT NOT NULL,
-    tipo_documento ENUM('VISTORIA_CAPITANIA', 'SEGURO_DPEM', 'LICENCA_AMBIENTAL', 'CERTIFICADO_NAVEGABILIDADE') NOT NULL,
+    tipo_documento ENUM('VISTORIA_CAPITANIA','SEGURO_DPEM','LICENCA_AMBIENTAL','CERTIFICADO_NAVEGABILIDADE') NOT NULL,
     numero_documento VARCHAR(50) NOT NULL,
     data_emissao DATE NOT NULL,
     data_vencimento DATE NOT NULL,
-    status ENUM('VALIDO', 'ALERTA_VENCIMENTO', 'VENCIDO') DEFAULT 'VALIDO',
+    status ENUM('VALIDO','ALERTA_VENCIMENTO','VENCIDO') DEFAULT 'VALIDO',
     FOREIGN KEY (id_embarcacao) REFERENCES embarcacoes(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
@@ -106,7 +106,7 @@ CREATE TABLE viagens (
     data_hora_partida DATETIME NOT NULL,
     data_hora_chegada DATETIME NULL,
     quantidade_passageiros INT NOT NULL DEFAULT 0,
-    status ENUM('EM_ANDAMENTO', 'CONCLUIDA', 'CANCELADA') DEFAULT 'EM_ANDAMENTO',
+    status ENUM('EM_ANDAMENTO','CONCLUIDA','CANCELADA') DEFAULT 'EM_ANDAMENTO',
     FOREIGN KEY (id_embarcacao) REFERENCES embarcacoes(id),
     FOREIGN KEY (id_comandante) REFERENCES tripulantes(id)
 ) ENGINE=InnoDB;
@@ -117,13 +117,13 @@ CREATE TABLE viagens (
 CREATE TABLE manutencoes (
     id INT AUTO_INCREMENT PRIMARY KEY,
     id_embarcacao INT NOT NULL,
-    tipo_manutencao ENUM('PREVENTIVA', 'CORRETIVA') NOT NULL,
+    tipo_manutencao ENUM('PREVENTIVA','CORRETIVA') NOT NULL,
     descricao_servico TEXT NOT NULL,
     horimetro_agendado INT NULL,
     data_agendamento DATE NOT NULL,
     data_execucao DATE NULL,
     custo_total DECIMAL(10,2) DEFAULT 0.00,
-    status ENUM('AGENDADA', 'EM_ANDAMENTO', 'CONCLUIDA', 'CANCELADA') DEFAULT 'AGENDADA',
+    status ENUM('AGENDADA','EM_ANDAMENTO','CONCLUIDA','CANCELADA') DEFAULT 'AGENDADA',
     FOREIGN KEY (id_embarcacao) REFERENCES embarcacoes(id)
 ) ENGINE=InnoDB;
 
@@ -149,8 +149,8 @@ CREATE TABLE incidentes (
     id_viagem INT NULL,
     data_incidente DATETIME DEFAULT CURRENT_TIMESTAMP,
     descricao TEXT NOT NULL,
-    gravidade ENUM('BAIXA', 'MEDIA', 'ALTA', 'CRITICA') NOT NULL,
-    status ENUM('PENDENTE', 'EM_ANALISE', 'RESOLVIDO') DEFAULT 'PENDENTE',
+    gravidade ENUM('BAIXA','MEDIA','ALTA','CRITICA') NOT NULL,
+    status ENUM('PENDENTE','EM_ANALISE','RESOLVIDO') DEFAULT 'PENDENTE',
     FOREIGN KEY (id_embarcacao) REFERENCES embarcacoes(id),
     FOREIGN KEY (id_viagem) REFERENCES viagens(id) ON DELETE SET NULL
 ) ENGINE=InnoDB;
@@ -159,11 +159,15 @@ CREATE TABLE incidentes (
 -- DADOS INICIAIS DE TESTE (POPULAÇÃO DO BANCO)
 -- ============================================================
 
--- Usuários do Sistema
+-- Usuários do Sistema (Administradores, Operadores e Técnicos)
 INSERT INTO usuarios (nome, email, senha, perfil) VALUES
-('Vitoria Monteiro (Admin)', 'admin@nautica.com', 'admin123', 'ADMINISTRADOR'),
-('Carlos Despachante', 'operador@nautica.com', 'operador123', 'OPERADOR'),
-('Roberto Engenheiro', 'tecnico@nautica.com', 'tecnico123', 'TECNICO');
+('Vitoria Monteiro de Carvalho', 'vitoria@nautica.com', 'admin123', 'ADMINISTRADOR'),
+('Leticia Salvador', 'leticia@nautica.com', 'admin123', 'ADMINISTRADOR'),
+('Yosef Klinsman', 'yosef@nautica.com', 'admin123', 'ADMINISTRADOR'),
+('Carlos Oliveira', 'carlos@nautica.com', 'operador123', 'OPERADOR'),
+('Mariana Lima', 'mariana@nautica.com', 'operador123', 'OPERADOR'),
+('Roberto Costa', 'roberto@nautica.com', 'tecnico123', 'TECNICO'),
+('Fernanda Santos', 'fernanda@nautica.com', 'tecnico123', 'TECNICO');
 
 -- Embarcações
 INSERT INTO embarcacoes (nome, modelo, capacidade_passageiros, ano_fabricacao, horimetro_horas, status) VALUES
@@ -177,7 +181,7 @@ INSERT INTO tripulantes (nome, cpf, categoria_habilitacao, numero_registro_cir, 
 ('Marcos Souza', '555.666.777-88', 'CONDUTOR_FLUVIAL', 'CIR-112233', '2026-06-15');
 
 -- Rotas
-INSERT INTO rotas (nome) VALUES 
+INSERT INTO rotas (nome) VALUES
 ('Parintins'),
 ('Careiro Castanho'),
 ('Itacoatiara'),
