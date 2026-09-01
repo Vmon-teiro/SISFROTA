@@ -8,6 +8,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.geom.Path2D;
 
 public class TelaLogin extends JFrame {
 
@@ -64,12 +65,11 @@ public class TelaLogin extends JFrame {
         pnlCard.setLayout(new BoxLayout(pnlCard, BoxLayout.Y_AXIS));
         pnlCard.setBorder(BorderFactory.createEmptyBorder(30, 35, 35, 35));
 
-        // CORREÇÃO: Ícone da Âncora com respiro no topo e alinhamento centralizado
+        // Ícone da Âncora
         JLabel lblIcone = new JLabel("⚓", SwingConstants.CENTER);
         lblIcone.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 42));
         lblIcone.setForeground(ACCENT);
         lblIcone.setAlignmentX(Component.CENTER_ALIGNMENT);
-        // Margem superior de 10px para evitar o corte do topo da âncora
         lblIcone.setBorder(BorderFactory.createEmptyBorder(10, 0, 5, 0));
 
         JLabel lblTitulo = new JLabel("Gestão Náutica");
@@ -84,7 +84,7 @@ public class TelaLogin extends JFrame {
 
         // Campos de entrada
         txtEmail = criarCampoTexto();
-        txtSenha = criarCampoSenha();
+        JPanel pnlSenhaContainer = criarCampoSenhaComOlho();
 
         txtSenha.addKeyListener(new KeyAdapter() {
             @Override
@@ -117,7 +117,7 @@ public class TelaLogin extends JFrame {
 
         pnlCard.add(criarLabelCampo("Senha de acesso"));
         pnlCard.add(Box.createVerticalStrut(5));
-        pnlCard.add(txtSenha);
+        pnlCard.add(pnlSenhaContainer);
         pnlCard.add(Box.createVerticalStrut(28));
 
         pnlCard.add(btnEntrar);
@@ -143,10 +143,76 @@ public class TelaLogin extends JFrame {
         return campo;
     }
 
-    private JPasswordField criarCampoSenha() {
-        JPasswordField campo = new JPasswordField();
-        estilizarCampoFormulario(campo);
-        return campo;
+    private JPanel criarCampoSenhaComOlho() {
+        JPanel painel = new JPanel(new BorderLayout());
+        painel.setBackground(new Color(248, 250, 252));
+        painel.setBorder(BorderFactory.createLineBorder(INPUT_BORDER, 1));
+        painel.setMaximumSize(new Dimension(Short.MAX_VALUE, 38));
+        painel.setPreferredSize(new Dimension(200, 38));
+
+        txtSenha = new JPasswordField();
+        txtSenha.setFont(FONT_BASE);
+        txtSenha.setForeground(TEXT_TITLE);
+        txtSenha.setBackground(new Color(248, 250, 252));
+        txtSenha.setCaretColor(ACCENT);
+        txtSenha.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 5));
+
+        char echoCharPadrao = txtSenha.getEchoChar();
+
+        JToggleButton btnOlho = new JToggleButton() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+                int w = getWidth();
+                int h = getHeight();
+                int cx = w / 2;
+                int cy = h / 2;
+
+                g2.setColor(isSelected() ? ACCENT : TEXT_MUTED);
+                g2.setStroke(new BasicStroke(1.8f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+
+                // Desenho do contorno do olho (amêndoa)
+                Path2D eye = new Path2D.Float();
+                eye.moveTo(cx - 9, cy);
+                eye.quadTo(cx, cy - 6, cx + 9, cy);
+                eye.quadTo(cx, cy + 6, cx - 9, cy);
+                g2.draw(eye);
+
+                // Pupila central
+                g2.fillOval(cx - 2, cy - 2, 5, 5);
+
+                // Risco diagonal quando a senha estiver ocultada (Estilo Nubank)
+                if (!isSelected()) {
+                    g2.setStroke(new BasicStroke(2.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+                    g2.drawLine(cx - 9, cy + 7, cx + 9, cy - 7);
+                }
+
+                g2.dispose();
+            }
+        };
+
+        btnOlho.setPreferredSize(new Dimension(38, 38));
+        btnOlho.setFocusPainted(false);
+        btnOlho.setContentAreaFilled(false);
+        btnOlho.setBorderPainted(false);
+        btnOlho.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnOlho.setToolTipText("Mostrar/Ocultar Senha");
+
+        btnOlho.addActionListener(e -> {
+            if (btnOlho.isSelected()) {
+                txtSenha.setEchoChar((char) 0); // Exibe a senha
+            } else {
+                txtSenha.setEchoChar(echoCharPadrao); // Oculta a senha
+            }
+            btnOlho.repaint();
+        });
+
+        painel.add(txtSenha, BorderLayout.CENTER);
+        painel.add(btnOlho, BorderLayout.EAST);
+
+        return painel;
     }
 
     private void estilizarCampoFormulario(JTextField campo) {
