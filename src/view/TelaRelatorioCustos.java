@@ -27,6 +27,7 @@ public class TelaRelatorioCustos extends JFrame {
     private static final Color TEXT_MUTED        = new Color(100, 116, 139); // slate-500
     private static final Color PRIMARY_BLUE      = new Color(37, 99, 235);   // blue-600
     private static final Color PRIMARY_GREEN     = new Color(16, 185, 129);  // emerald-500
+    private static final Color WARNING_ORANGE    = new Color(217, 119, 6);   // amber-600
 
     private final RelatorioController controller = new RelatorioController();
     private JTable tblCustos;
@@ -105,7 +106,7 @@ public class TelaRelatorioCustos extends JFrame {
         lblTotalAbastecimento = new JLabel("R$ 0,00");
 
         container.add(criarCardKPI("CUSTO TOTAL CONSOLIDADO", lblTotalGeral, PRIMARY_BLUE));
-        container.add(criarCardKPI("TOTAL EM MANUTENÇÕES", lblTotalManutencao, new Color(217, 119, 6)));
+        container.add(criarCardKPI("TOTAL EM MANUTENÇÕES", lblTotalManutencao, WARNING_ORANGE));
         container.add(criarCardKPI("TOTAL EM ABASTECIMENTOS", lblTotalAbastecimento, PRIMARY_GREEN));
 
         return container;
@@ -190,11 +191,8 @@ public class TelaRelatorioCustos extends JFrame {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 12, 16));
         panel.setBackground(BG_APP);
 
-        JButton btnBaixarPDF = new JButton("Gerar e Baixar PDF");
-        estilarBotao(btnBaixarPDF, PRIMARY_BLUE);
-
-        JButton btnEnviarEmail = new JButton("Enviar por E-mail");
-        estilarBotao(btnEnviarEmail, PRIMARY_GREEN);
+        JButton btnBaixarPDF = criarBotaoArredondado("Gerar e Baixar PDF", PRIMARY_BLUE);
+        JButton btnEnviarEmail = criarBotaoArredondado("Enviar por E-mail", PRIMARY_GREEN);
 
         btnBaixarPDF.addActionListener(e -> baixarPDF());
         btnEnviarEmail.addActionListener(e -> enviarEmail());
@@ -204,19 +202,44 @@ public class TelaRelatorioCustos extends JFrame {
         return panel;
     }
 
-    private void estilarBotao(JButton btn, Color corFundo) {
+    private JButton criarBotaoArredondado(String texto, Color corFundo) {
+        JButton btn = new JButton(texto) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+                if (getModel().isPressed()) {
+                    g2.setColor(corFundo.darker());
+                } else if (getModel().isRollover()) {
+                    g2.setColor(corFundo.brighter());
+                } else {
+                    g2.setColor(corFundo);
+                }
+
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 12, 12);
+                g2.dispose();
+
+                super.paintComponent(g);
+            }
+        };
+
         btn.setFont(new Font("Segoe UI", Font.BOLD, 12));
         btn.setForeground(Color.WHITE);
-        btn.setBackground(corFundo);
+        btn.setContentAreaFilled(false);
+        btn.setBorderPainted(false);
         btn.setFocusPainted(false);
-        btn.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        btn.setOpaque(false);
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btn.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+
+        return btn;
     }
 
     private void carregarDados() {
         tableModel.setRowCount(0);
         dadosCarregados = controller.obterConsolidadoCustos();
-        NumberFormat nf = NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));
+        NumberFormat nf = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("pt-BR"));
 
         double somaGeral = 0;
         double somaManutencao = 0;
