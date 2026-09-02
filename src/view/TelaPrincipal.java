@@ -13,18 +13,18 @@ import java.util.List;
 public class TelaPrincipal extends JFrame {
 
     // ---------------------------------------------------------------
-    // PALETA DE CORES (Design Tokens)
+    // PALETA DE CORES (Design Tokens Dark Glass)
     // ---------------------------------------------------------------
     private static final Color BG_APP             = new Color(241, 245, 249); // slate-100
-    private static final Color HEADER_DARK        = new Color(15, 23, 42);    // slate-900
-    private static final Color HEADER_DARK_2      = new Color(30, 41, 59);    // slate-800
+    private static final Color HEADER_DARK        = new Color(11, 15, 25);    // Slate-950
+    private static final Color HEADER_DARK_2      = new Color(18, 24, 38);    // Slate-900
+    private static final Color HEADER_BORDER      = new Color(255, 255, 255, 12); // Borda sutil de vidro
     private static final Color CARD_BG            = Color.WHITE;
     private static final Color CARD_BORDER        = new Color(226, 232, 240); // slate-200
     private static final Color CARD_BORDER_HOVER  = new Color(99, 102, 241);  // indigo-500
     private static final Color CARD_BG_HOVER      = new Color(248, 250, 252); // slate-50
     private static final Color TEXT_TITLE         = new Color(15, 23, 42);    // slate-900
     private static final Color TEXT_MUTED         = new Color(100, 116, 139); // slate-500
-    private static final Color TEXT_ON_DARK       = new Color(226, 232, 240); // slate-200
     private static final Color ACCENT             = new Color(99, 102, 241);  // indigo-500
     private static final Color ACCENT_CYAN        = new Color(56, 189, 248);  // sky-400
     private static final Color DANGER             = new Color(239, 68, 68);   // red-500
@@ -50,19 +50,18 @@ public class TelaPrincipal extends JFrame {
     }
 
     private void verificarEExibirAlertas() {
-    SwingUtilities.invokeLater(() -> {
-        AlertaController alertaController = new AlertaController();
-        // Passando o usuário logado para filtrar os alertas por perfil
-        alertasAtivos = alertaController.verificarAlertasVencimento(usuarioLogado);
+        SwingUtilities.invokeLater(() -> {
+            AlertaController alertaController = new AlertaController();
+            alertasAtivos = alertaController.verificarAlertasVencimento(usuarioLogado);
 
-        if (!alertasAtivos.isEmpty()) {
-            btnNotificacoes.setNotificacao(true, alertasAtivos.size());
-            exibirDialogoAlertas();
-        } else {
-            btnNotificacoes.setNotificacao(false, 0);
-        }
-    });
-}
+            if (!alertasAtivos.isEmpty()) {
+                btnNotificacoes.setNotificacao(true, alertasAtivos.size());
+                exibirDialogoAlertas();
+            } else {
+                btnNotificacoes.setNotificacao(false, 0);
+            }
+        });
+    }
 
     private void exibirDialogoAlertas() {
         if (alertasAtivos.isEmpty()) {
@@ -97,113 +96,170 @@ public class TelaPrincipal extends JFrame {
     }
 
     // ---------------------------------------------------------------
-    // CABEÇALHO REFINADO
-    // ---------------------------------------------------------------
-    private JPanel criarHeaderRefinado() {
-        JPanel panelHeader = new JPanel(new BorderLayout(20, 0)) {
-            @Override
-            protected void paintComponent(Graphics g) {
-                Graphics2D g2 = (Graphics2D) g.create();
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                GradientPaint gp = new GradientPaint(0, 0, HEADER_DARK, getWidth(), getHeight(), HEADER_DARK_2);
-                g2.setPaint(gp);
-                g2.fillRect(0, 0, getWidth(), getHeight());
-                g2.dispose();
-                super.paintComponent(g);
-            }
-        };
-        panelHeader.setOpaque(false);
-        panelHeader.setBorder(BorderFactory.createEmptyBorder(18, 28, 18, 28));
+// CABEÇALHO REFINADO DARK GLASS (COM AVATAR DINÂMICO)
+// ---------------------------------------------------------------
+private JPanel criarHeaderRefinado() {
+    JPanel panelHeader = new JPanel(new BorderLayout(20, 0)) {
+        @Override
+        protected void paintComponent(Graphics g) {
+            Graphics2D g2 = (Graphics2D) g.create();
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            
+            GradientPaint gp = new GradientPaint(0, 0, HEADER_DARK, getWidth(), getHeight(), HEADER_DARK_2);
+            g2.setPaint(gp);
+            g2.fillRect(0, 0, getWidth(), getHeight());
 
-        // LADO ESQUERDO: Marca Náutica + Título + Usuário
-        JPanel pnlInfo = new JPanel(new FlowLayout(FlowLayout.LEFT, 16, 0));
-        pnlInfo.setOpaque(false);
+            g2.setColor(HEADER_BORDER);
+            g2.drawLine(0, getHeight() - 1, getWidth(), getHeight() - 1);
+            
+            g2.dispose();
+            super.paintComponent(g);
+        }
+    };
+    panelHeader.setOpaque(false);
+    panelHeader.setBorder(BorderFactory.createEmptyBorder(16, 28, 16, 28));
 
-        // Ícone do Leme/Âncora Vetorial
-        JPanel pnlLogo = new JPanel() {
-            @Override
-            protected void paintComponent(Graphics g) {
-                Graphics2D g2 = (Graphics2D) g.create();
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(new Color(56, 189, 248, 40));
-                g2.fillOval(0, 0, 42, 42);
+    // LADO ESQUERDO: Avatar + Título + Usuário
+    JPanel pnlInfo = new JPanel(new FlowLayout(FlowLayout.LEFT, 16, 0));
+    pnlInfo.setOpaque(false);
+
+    String perfilRaw = usuarioLogado.getPerfil() != null ? usuarioLogado.getPerfil().toUpperCase() : "USUÁRIO";
+
+    // Painel do Avatar Redondo Dinâmico
+    JPanel pnlLogo = criarPainelAvatar(perfilRaw);
+
+    String nome = usuarioLogado.getNome();
+
+    JPanel pnlTitulos = new JPanel();
+    pnlTitulos.setLayout(new BoxLayout(pnlTitulos, BoxLayout.Y_AXIS));
+    pnlTitulos.setOpaque(false);
+
+    JLabel lblSistema = new JLabel("SISTEMA DE GESTÃO NÁUTICA");
+    lblSistema.setFont(new Font("Segoe UI", Font.BOLD, 9));
+    lblSistema.setForeground(new Color(148, 163, 184));
+
+    JLabel lblUsuario = new JLabel("<html><span style='color:#F8FAFC; font-size:13pt; font-family:Segoe UI;'><b>" + nome + "</b></span></html>");
+
+    pnlTitulos.add(lblSistema);
+    pnlTitulos.add(Box.createVerticalStrut(2));
+    pnlTitulos.add(lblUsuario);
+
+    // Badge de Perfil Minimalista
+    JLabel lblBadge = new JLabel(perfilRaw) {
+        @Override
+        protected void paintComponent(Graphics g) {
+            Graphics2D g2 = (Graphics2D) g.create();
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.setColor(new Color(99, 102, 241, 30));
+            g2.fillRoundRect(0, 0, getWidth(), getHeight(), 12, 12);
+            g2.setColor(new Color(99, 102, 241, 90));
+            g2.setStroke(new BasicStroke(1f));
+            g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 12, 12);
+            g2.dispose();
+            super.paintComponent(g);
+        }
+    };
+    lblBadge.setFont(new Font("Segoe UI", Font.BOLD, 9));
+    lblBadge.setForeground(new Color(199, 210, 254));
+    lblBadge.setBorder(BorderFactory.createEmptyBorder(4, 10, 4, 10));
+
+    pnlInfo.add(pnlLogo);
+    pnlInfo.add(pnlTitulos);
+    pnlInfo.add(Box.createHorizontalStrut(8));
+    pnlInfo.add(lblBadge);
+
+    // LADO DIREITO: Notificações + Sair
+    JPanel pnlAcoesTopo = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
+    pnlAcoesTopo.setOpaque(false);
+
+    btnNotificacoes = new BotaoNotificacao("Notificações");
+    btnNotificacoes.setToolTipText("Clique para ver os alertas pendentes");
+    btnNotificacoes.addActionListener(e -> exibirDialogoAlertas());
+
+    JButton btnSair = criarBotaoSair();
+
+    pnlAcoesTopo.add(btnNotificacoes);
+    pnlAcoesTopo.add(btnSair);
+
+    panelHeader.add(pnlInfo, BorderLayout.WEST);
+    panelHeader.add(pnlAcoesTopo, BorderLayout.EAST);
+    return panelHeader;
+}
+
+// ---------------------------------------------------------------
+// GERADOR DE AVATAR REDONDO POR PERFIL
+// ---------------------------------------------------------------
+    private JPanel criarPainelAvatar(String perfil) {
+    String caminhoRelativo;
+
+    switch (perfil) {
+        case "ADMINISTRADOR":
+            caminhoRelativo = "docs/images/cavalo.jpg";
+            break;
+        case "OPERADOR":
+            caminhoRelativo = "docs/images/cara1.png";
+            break;
+        case "TECNICO":
+            caminhoRelativo = "docs/images/outrocara.jpg";
+            break;
+        default:
+            caminhoRelativo = null;
+            break;
+    }
+
+    Image img = null;
+    if (caminhoRelativo != null) {
+        ImageIcon icon = new ImageIcon(caminhoRelativo);
+        if (icon.getImageLoadStatus() == MediaTracker.COMPLETE) {
+            img = icon.getImage();
+        }
+    }
+
+    final Image avatarImg = img;
+
+    JPanel pnlAvatar = new JPanel() {
+        @Override
+        protected void paintComponent(Graphics g) {
+            Graphics2D g2 = (Graphics2D) g.create();
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+
+            int size = 42;
+
+            if (avatarImg != null) {
+                // Recorta em formato circular
+                g2.setClip(new java.awt.geom.Ellipse2D.Float(0, 0, size, size));
+                g2.drawImage(avatarImg, 0, 0, size, size, this);
+
+                // Borda suave ao redor da foto
+                g2.setClip(null);
+                g2.setColor(ACCENT_CYAN);
+                g2.setStroke(new BasicStroke(1.5f));
+                g2.drawOval(0, 0, size - 1, size - 1);
+            } else {
+                // Fallback: Ícone padrão se a imagem não existir ou falhar
+                g2.setColor(new Color(56, 189, 248, 20));
+                g2.fillOval(0, 0, size, size);
+
                 g2.setColor(ACCENT_CYAN);
                 g2.setStroke(new BasicStroke(2.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 
-                int cx = 21, cy = 21;
+                int cx = size / 2, cy = size / 2;
                 g2.drawOval(cx - 10, cy - 10, 20, 20);
                 g2.drawOval(cx - 4, cy - 4, 8, 8);
-                for (int i = 0; i < 8; i++) {
-                    g2.drawLine(cx, cy - 10, cx, cy - 16);
-                    g2.rotate(Math.toRadians(45), cx, cy);
-                }
-                g2.dispose();
             }
-        };
-        pnlLogo.setPreferredSize(new Dimension(42, 42));
-        pnlLogo.setOpaque(false);
 
-        String nome = usuarioLogado.getNome();
-        String perfilRaw = usuarioLogado.getPerfil() != null ? usuarioLogado.getPerfil().toUpperCase() : "USUÁRIO";
+            g2.dispose();
+        }
+    };
 
-        JPanel pnlTitulos = new JPanel();
-        pnlTitulos.setLayout(new BoxLayout(pnlTitulos, BoxLayout.Y_AXIS));
-        pnlTitulos.setOpaque(false);
-
-        JLabel lblSistema = new JLabel("SISTEMA DE GESTÃO NÁUTICA");
-        lblSistema.setFont(new Font("Segoe UI", Font.BOLD, 10));
-        lblSistema.setForeground(ACCENT_CYAN);
-
-        JLabel lblUsuario = new JLabel("<html><span style='color:#F8FAFC; font-size:14pt; font-family:Segoe UI;'><b>" + nome + "</b></span></html>");
-
-        pnlTitulos.add(lblSistema);
-        pnlTitulos.add(Box.createVerticalStrut(2));
-        pnlTitulos.add(lblUsuario);
-
-        // Badge de Perfil Customizado
-        JLabel lblBadge = new JLabel(perfilRaw) {
-            @Override
-            protected void paintComponent(Graphics g) {
-                Graphics2D g2 = (Graphics2D) g.create();
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(new Color(99, 102, 241, 50));
-                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 12, 12);
-                g2.setColor(ACCENT);
-                g2.setStroke(new BasicStroke(1f));
-                g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 12, 12);
-                g2.dispose();
-                super.paintComponent(g);
-            }
-        };
-        lblBadge.setFont(new Font("Segoe UI", Font.BOLD, 9));
-        lblBadge.setForeground(new Color(224, 231, 255));
-        lblBadge.setBorder(BorderFactory.createEmptyBorder(4, 10, 4, 10));
-
-        pnlInfo.add(pnlLogo);
-        pnlInfo.add(pnlTitulos);
-        pnlInfo.add(Box.createHorizontalStrut(8));
-        pnlInfo.add(lblBadge);
-
-        // LADO DIREITO: Notificações + Sair
-        JPanel pnlAcoesTopo = new JPanel(new FlowLayout(FlowLayout.RIGHT, 12, 0));
-        pnlAcoesTopo.setOpaque(false);
-
-        btnNotificacoes = new BotaoNotificacao("Notificações");
-        btnNotificacoes.setToolTipText("Clique para ver os alertas pendentes");
-        btnNotificacoes.addActionListener(e -> exibirDialogoAlertas());
-
-        JButton btnSair = criarBotaoSair();
-
-        pnlAcoesTopo.add(btnNotificacoes);
-        pnlAcoesTopo.add(btnSair);
-
-        panelHeader.add(pnlInfo, BorderLayout.WEST);
-        panelHeader.add(pnlAcoesTopo, BorderLayout.EAST);
-        return panelHeader;
-    }
+    pnlAvatar.setPreferredSize(new Dimension(42, 42));
+    pnlAvatar.setOpaque(false);
+    return pnlAvatar;
+}
 
     // ---------------------------------------------------------------
-    // PAINEL DE GRÁFICOS DINÂMICOS / PERSONALIZADOS POR PERFIL
+    // PAINEL DE GRÁFICOS DINÂMICOS
     // ---------------------------------------------------------------
     private JPanel criarPainelGraficosCustomizados() {
         JPanel pnlContainer = new JPanel(new GridLayout(1, 2, 20, 0));
@@ -270,6 +326,9 @@ public class TelaPrincipal extends JFrame {
         return pnlContainer;
     }
 
+    // ---------------------------------------------------------------
+    // BOTÃO SAIR (Dark Glass com Hover Vermelho)
+    // ---------------------------------------------------------------
     private JButton criarBotaoSair() {
         JButton btn = new JButton("Sair") {
             @Override
@@ -277,15 +336,20 @@ public class TelaPrincipal extends JFrame {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 boolean hover = getModel().isRollover();
-                g2.setColor(hover ? DANGER : Color.WHITE);
+                
+                g2.setColor(hover ? new Color(239, 68, 68, 35) : new Color(255, 255, 255, 10));
                 g2.fillRoundRect(0, 0, getWidth(), getHeight(), 10, 10);
+                
+                g2.setColor(hover ? DANGER : HEADER_BORDER);
+                g2.setStroke(new BasicStroke(1f));
+                g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 10, 10);
+                
                 g2.dispose();
-                setForeground(hover ? Color.WHITE : DANGER);
+                setForeground(hover ? Color.WHITE : new Color(248, 113, 113));
                 super.paintComponent(g);
             }
         };
         btn.setFont(FONT_BOLD);
-        btn.setForeground(DANGER);
         btn.setContentAreaFilled(false);
         btn.setFocusPainted(false);
         btn.setBorderPainted(false);
@@ -516,19 +580,16 @@ public class TelaPrincipal extends JFrame {
 
             int w = getWidth(), h = getHeight();
 
-            // Card Fundo
             g2.setColor(CARD_BG);
             g2.fillRoundRect(0, 0, w - 1, h - 1, 14, 14);
             g2.setColor(CARD_BORDER);
             g2.setStroke(new BasicStroke(1f));
             g2.drawRoundRect(0, 0, w - 1, h - 1, 14, 14);
 
-            // Título
             g2.setFont(new Font("Segoe UI", Font.BOLD, 11));
             g2.setColor(TEXT_MUTED);
             g2.drawString(titulo.toUpperCase(), 14, 22);
 
-            // Cálculo dos Arcos
             double total = 0;
             for (double v : valores) total += v;
 
@@ -544,14 +605,12 @@ public class TelaPrincipal extends JFrame {
                 startAngle += angle;
             }
 
-            // Furo Central da Rosca
             int holeSize = 50;
             int hx = x + (diameter - holeSize) / 2;
             int hy = y + (diameter - holeSize) / 2;
             g2.setColor(CARD_BG);
             g2.fillOval(hx, hy, holeSize, holeSize);
 
-            // Texto Central
             g2.setFont(new Font("Segoe UI", Font.BOLD, 10));
             g2.setColor(TEXT_TITLE);
             FontMetrics fm = g2.getFontMetrics();
@@ -559,7 +618,6 @@ public class TelaPrincipal extends JFrame {
             int ty = hy + ((holeSize - fm.getHeight()) / 2) + fm.getAscent();
             g2.drawString(centroTexto, tx, ty);
 
-            // Legendas à Direita
             int lx = x + diameter + 18;
             int ly = y + 14;
             g2.setFont(new Font("Segoe UI", Font.PLAIN, 10));
@@ -601,19 +659,16 @@ public class TelaPrincipal extends JFrame {
 
             int w = getWidth(), h = getHeight();
 
-            // Card Fundo
             g2.setColor(CARD_BG);
             g2.fillRoundRect(0, 0, w - 1, h - 1, 14, 14);
             g2.setColor(CARD_BORDER);
             g2.setStroke(new BasicStroke(1f));
             g2.drawRoundRect(0, 0, w - 1, h - 1, 14, 14);
 
-            // Título
             g2.setFont(new Font("Segoe UI", Font.BOLD, 11));
             g2.setColor(TEXT_MUTED);
             g2.drawString(titulo.toUpperCase(), 14, 22);
 
-            // Maior valor para escala
             double maxVal = 0;
             for (double v : valores) if (v > maxVal) maxVal = v;
 
@@ -630,11 +685,9 @@ public class TelaPrincipal extends JFrame {
                 int bx = startX + i * (barWidth + gap);
                 int by = startY - barH;
 
-                // Barra Arredondada
                 g2.setColor(corBarra);
                 g2.fillRoundRect(bx, by, barWidth, barH, 4, 4);
 
-                // Label X
                 g2.setColor(TEXT_MUTED);
                 g2.drawString(labels[i], bx + (barWidth / 2) - 8, startY + 14);
             }
@@ -644,7 +697,7 @@ public class TelaPrincipal extends JFrame {
     }
 
     // ---------------------------------------------------------------
-    // BOTÃO DE NOTIFICAÇÃO
+    // BOTÃO DE NOTIFICAÇÃO (Dark Glass)
     // ---------------------------------------------------------------
     private static class BotaoNotificacao extends JButton {
         private boolean temNotificacao = false;
@@ -653,11 +706,11 @@ public class TelaPrincipal extends JFrame {
         public BotaoNotificacao(String texto) {
             super(texto);
             setFont(FONT_BOLD);
-            setForeground(TEXT_ON_DARK);
+            setForeground(new Color(226, 232, 240));
             setContentAreaFilled(false);
             setFocusPainted(false);
             setBorderPainted(false);
-            setBorder(BorderFactory.createEmptyBorder(8, 36, 8, 20));
+            setBorder(BorderFactory.createEmptyBorder(8, 36, 8, 18));
             setCursor(new Cursor(Cursor.HAND_CURSOR));
         }
 
@@ -673,12 +726,17 @@ public class TelaPrincipal extends JFrame {
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
             boolean hover = getModel().isRollover();
-            g2.setColor(hover ? new Color(71, 85, 105) : new Color(51, 65, 85));
+            
+            g2.setColor(hover ? new Color(255, 255, 255, 18) : new Color(255, 255, 255, 10));
             g2.fillRoundRect(0, 0, getWidth(), getHeight(), 10, 10);
+
+            g2.setColor(hover ? new Color(255, 255, 255, 25) : HEADER_BORDER);
+            g2.setStroke(new BasicStroke(1f));
+            g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 10, 10);
 
             int bx = 14;
             int by = (getHeight() - 16) / 2;
-            g2.setColor(TEXT_ON_DARK);
+            g2.setColor(new Color(226, 232, 240));
             g2.setStroke(new BasicStroke(1.5f));
             g2.drawArc(bx + 4, by, 4, 4, 0, 180);
 
@@ -702,8 +760,8 @@ public class TelaPrincipal extends JFrame {
                 g2.setColor(DANGER);
                 g2.fillOval(x, y, raio, raio);
 
-                g2.setColor(new Color(30, 41, 59));
-                g2.setStroke(new BasicStroke(2f));
+                g2.setColor(HEADER_DARK);
+                g2.setStroke(new BasicStroke(1.5f));
                 g2.drawOval(x, y, raio, raio);
 
                 if (quantidade > 0) {

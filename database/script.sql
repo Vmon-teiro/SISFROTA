@@ -164,6 +164,7 @@ INSERT INTO usuarios (nome, email, senha, perfil) VALUES
 ('Vitoria Monteiro de Carvalho', 'vitoria@nautica.com', 'admin123', 'ADMINISTRADOR'),
 ('Leticia Salvador', 'leticia@nautica.com', 'admin123', 'ADMINISTRADOR'),
 ('Yosef Klinsman', 'yosef@nautica.com', 'admin123', 'ADMINISTRADOR'),
+('Bernardo Oliveira', 'bernardo@nautica.com', 'admin123', 'ADMINISTRADOR'),
 ('Carlos Oliveira', 'carlos@nautica.com', 'operador123', 'OPERADOR'),
 ('Mariana Lima', 'mariana@nautica.com', 'operador123', 'OPERADOR'),
 ('Roberto Costa', 'roberto@nautica.com', 'tecnico123', 'TECNICO'),

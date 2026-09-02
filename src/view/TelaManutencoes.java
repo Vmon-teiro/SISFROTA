@@ -2,12 +2,15 @@ package view;
 
 import controller.ManutencaoController;
 import dao.EmbarcacaoDAO;
+import dao.ManutencaoDAO;
 import model.Embarcacao;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.sql.Date;
 
 public class TelaManutencoes extends JFrame {
@@ -234,6 +237,40 @@ public class TelaManutencoes extends JFrame {
         tblManutencoes = new JTable(modelManutencoes);
         estilarTabela(tblManutencoes);
 
+        // Menu de Contexto (Botão Direito) para Excluir do Histórico
+        JPopupMenu popupMenu = new JPopupMenu();
+        JMenuItem itemExcluir = new JMenuItem("Excluir do Histórico");
+        itemExcluir.setForeground(DANGER_RED);
+        itemExcluir.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        popupMenu.add(itemExcluir);
+
+        itemExcluir.addActionListener(e -> excluirOSCancelada());
+
+        tblManutencoes.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                verificarMenuPopup(e);
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                verificarMenuPopup(e);
+            }
+
+            private void verificarMenuPopup(MouseEvent e) {
+                if (e.isPopupTrigger()) {
+                    int row = tblManutencoes.rowAtPoint(e.getPoint());
+                    if (row != -1) {
+                        tblManutencoes.setRowSelectionInterval(row, row);
+                        String status = String.valueOf(modelManutencoes.getValueAt(row, 7));
+                        if ("CANCELADA".equalsIgnoreCase(status)) {
+                            popupMenu.show(e.getComponent(), e.getX(), e.getY());
+                        }
+                    }
+                }
+            }
+        });
+
         JScrollPane scrollTabela = new JScrollPane(tblManutencoes);
         scrollTabela.setBorder(BorderFactory.createLineBorder(CARD_BORDER));
 
@@ -453,6 +490,37 @@ public class TelaManutencoes extends JFrame {
             carregarDados();
         } else {
             JOptionPane.showMessageDialog(this, "Não foi possível atualizar o status.", "Erro", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void excluirOSCancelada() {
+        int row = tblManutencoes.getSelectedRow();
+        if (row == -1) return;
+
+        int id = (int) modelManutencoes.getValueAt(row, 0);
+        String status = String.valueOf(modelManutencoes.getValueAt(row, 7));
+
+        if (!"CANCELADA".equalsIgnoreCase(status)) {
+            JOptionPane.showMessageDialog(this, "Apenas ordens com status CANCELADA podem ser excluídas.", "Aviso", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        int confirmacao = JOptionPane.showConfirmDialog(
+            this,
+            "Deseja realmente remover esta OS cancelada do histórico?",
+            "Confirmar Exclusão",
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.WARNING_MESSAGE
+        );
+
+        if (confirmacao == JOptionPane.YES_OPTION) {
+            boolean ok = new ManutencaoDAO().excluir(id);
+            if (ok) {
+                JOptionPane.showMessageDialog(this, "OS removida do histórico com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+                carregarDados();
+            } else {
+                JOptionPane.showMessageDialog(this, "Erro ao excluir a OS do banco de dados.", "Erro", JOptionPane.ERROR_MESSAGE);
+            }
         }
     }
 }

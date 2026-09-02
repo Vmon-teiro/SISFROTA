@@ -76,4 +76,17 @@ public class ManutencaoDAO {
             return false;
         }
     }
+
+    public boolean excluir(int idManutencao) {
+    String sql = "DELETE FROM manutencoes WHERE id = ?";
+    try (Connection conn = ConexaoDAO.obterConexao();
+         PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+        stmt.setInt(1, idManutencao);
+        return stmt.executeUpdate() > 0;
+    } catch (SQLException e) {
+        e.printStackTrace();
+        return false;
+    }
+  } 
 }

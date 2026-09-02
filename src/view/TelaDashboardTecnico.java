@@ -259,58 +259,117 @@ public class TelaDashboardTecnico extends JFrame {
     }
 
     private void abrirDialogoNovaOS() {
-        List<Object[]> embarcacoes = controller.obterEmbarcacoes();
-        if (embarcacoes.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Nenhuma embarcação cadastrada.", "Aviso", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
+    List<Object[]> embarcacoes = controller.obterEmbarcacoes();
+    if (embarcacoes.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Nenhuma embarcação cadastrada.", "Aviso", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
 
-        JComboBox<String> cbEmbarcacao = new JComboBox<>();
-        for (Object[] emb : embarcacoes) {
-            cbEmbarcacao.addItem(emb[0] + " - " + emb[1]);
-        }
+    // --- Componentes do Formulário ---
+    JComboBox<String> cbEmbarcacao = new JComboBox<>();
+    for (Object[] emb : embarcacoes) {
+        cbEmbarcacao.addItem(emb[0] + " - " + emb[1]);
+    }
+    estilarCampoFormulario(cbEmbarcacao);
 
-        JComboBox<String> cbTipo = new JComboBox<>(new String[]{"PREVENTIVA", "CORRETIVA"});
-        JTextArea txtDescricao = new JTextArea(4, 25);
-        txtDescricao.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        txtDescricao.setLineWrap(true);
-        txtDescricao.setWrapStyleWord(true);
+    JComboBox<String> cbTipo = new JComboBox<>(new String[]{"PREVENTIVA", "CORRETIVA"});
+    estilarCampoFormulario(cbTipo);
 
-        JTextField txtHorimetro = new JTextField();
-        JSpinner spDataAgendamento = new JSpinner(new SpinnerDateModel());
-        spDataAgendamento.setEditor(new JSpinner.DateEditor(spDataAgendamento, "dd/MM/yyyy"));
+    JTextField txtHorimetro = new JTextField();
+    estilarCampoFormulario(txtHorimetro);
 
-        JPanel panel = new JPanel(new GridLayout(0, 1, 5, 5));
-        panel.add(criarLabel("Embarcação:"));
-        panel.add(cbEmbarcacao);
-        panel.add(criarLabel("Tipo de Manutenção:"));
-        panel.add(cbTipo);
-        panel.add(criarLabel("Descrição Detalhada do Serviço / Peças:"));
-        panel.add(new JScrollPane(txtDescricao));
-        panel.add(criarLabel("Horímetro Agendado (Gatilho Preventiva) [Opcional]:"));
-        panel.add(txtHorimetro);
-        panel.add(criarLabel("Data Prevista para Execução:"));
-        panel.add(spDataAgendamento);
+    JSpinner spDataAgendamento = new JSpinner(new SpinnerDateModel());
+    spDataAgendamento.setEditor(new JSpinner.DateEditor(spDataAgendamento, "dd/MM/yyyy"));
+    estilarCampoFormulario(spDataAgendamento);
 
-        int result = JOptionPane.showConfirmDialog(this, panel, "Abrir Nova Ordem de Serviço", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+    JTextArea txtDescricao = new JTextArea(4, 25);
+    txtDescricao.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+    txtDescricao.setLineWrap(true);
+    txtDescricao.setWrapStyleWord(true);
+    JScrollPane scrollDescricao = new JScrollPane(txtDescricao);
+    scrollDescricao.setBorder(BorderFactory.createLineBorder(CARD_BORDER));
 
-        if (result == JOptionPane.OK_OPTION) {
-            int selectedIndex = cbEmbarcacao.getSelectedIndex();
-            int idEmbarcacao = (int) embarcacoes.get(selectedIndex)[0];
-            String tipo = (String) cbTipo.getSelectedItem();
-            String desc = txtDescricao.getText();
-            String horimetroStr = txtHorimetro.getText();
-            java.util.Date dataAgendamento = (java.util.Date) spDataAgendamento.getValue();
+    // --- Container Principal do Diálogo ---
+    JPanel mainPanel = new JPanel(new BorderLayout(0, 10));
+    mainPanel.setPreferredSize(new Dimension(540, 360));
+    mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-            String res = controller.criarNovaOS(idEmbarcacao, tipo, desc, horimetroStr, dataAgendamento);
-            if ("OK".equals(res)) {
-                JOptionPane.showMessageDialog(this, "Ordem de Serviço criada com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
-                carregarDados();
-            } else {
-                JOptionPane.showMessageDialog(this, res, "Aviso", JOptionPane.WARNING_MESSAGE);
-            }
+    JPanel formPanel = new JPanel(new GridBagLayout());
+    GridBagConstraints gbc = new GridBagConstraints();
+    gbc.fill = GridBagConstraints.HORIZONTAL;
+    gbc.insets = new Insets(4, 6, 6, 6);
+    gbc.weightx = 0.5;
+
+    // Linha 0: Títulos Coluna 1 e 2
+    gbc.gridx = 0; gbc.gridy = 0;
+    formPanel.add(criarLabel("Embarcação:"), gbc);
+
+    gbc.gridx = 1; gbc.gridy = 0;
+    formPanel.add(criarLabel("Tipo de Manutenção:"), gbc);
+
+    // Linha 1: Campos Embarcação e Tipo
+    gbc.gridx = 0; gbc.gridy = 1;
+    formPanel.add(cbEmbarcacao, gbc);
+
+    gbc.gridx = 1; gbc.gridy = 1;
+    formPanel.add(cbTipo, gbc);
+
+    // Linha 2: Títulos Data e Horímetro
+    gbc.gridx = 0; gbc.gridy = 2;
+    formPanel.add(criarLabel("Data Prevista Execução:"), gbc);
+
+    gbc.gridx = 1; gbc.gridy = 2;
+    formPanel.add(criarLabel("Horímetro Gatilho (Opcional):"), gbc);
+
+    // Linha 3: Campos Data e Horímetro
+    gbc.gridx = 0; gbc.gridy = 3;
+    formPanel.add(spDataAgendamento, gbc);
+
+    gbc.gridx = 1; gbc.gridy = 3;
+    formPanel.add(txtHorimetro, gbc);
+
+    // Linha 4: Título Descrição (Largura Total)
+    gbc.gridx = 0; gbc.gridy = 4; gbc.gridwidth = 2;
+    formPanel.add(criarLabel("Descrição Detalhada do Serviço / Peças:"), gbc);
+
+    // Linha 5: Campo Descrição Expansível
+    gbc.gridx = 0; gbc.gridy = 5; gbc.gridwidth = 2; gbc.weighty = 1.0;
+    gbc.fill = GridBagConstraints.BOTH;
+    formPanel.add(scrollDescricao, gbc);
+
+    mainPanel.add(formPanel, BorderLayout.CENTER);
+
+    int result = JOptionPane.showConfirmDialog(
+        this, 
+        mainPanel, 
+        "Abrir Nova Ordem de Serviço", 
+        JOptionPane.OK_CANCEL_OPTION, 
+        JOptionPane.PLAIN_MESSAGE
+    );
+
+    if (result == JOptionPane.OK_OPTION) {
+        int selectedIndex = cbEmbarcacao.getSelectedIndex();
+        int idEmbarcacao = (int) embarcacoes.get(selectedIndex)[0];
+        String tipo = (String) cbTipo.getSelectedItem();
+        String desc = txtDescricao.getText();
+        String horimetroStr = txtHorimetro.getText();
+        java.util.Date dataAgendamento = (java.util.Date) spDataAgendamento.getValue();
+
+        String res = controller.criarNovaOS(idEmbarcacao, tipo, desc, horimetroStr, dataAgendamento);
+        if ("OK".equals(res)) {
+            JOptionPane.showMessageDialog(this, "Ordem de Serviço criada com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+            carregarDados();
+        } else {
+            JOptionPane.showMessageDialog(this, res, "Aviso", JOptionPane.WARNING_MESSAGE);
         }
     }
+}
+
+// Método auxiliar de estilização dos inputs
+private void estilarCampoFormulario(JComponent component) {
+    component.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+    component.setPreferredSize(new Dimension(component.getPreferredSize().width, 32));
+}
 
     private void abrirDialogoConclusao() {
         int row = tblOS.getSelectedRow();
