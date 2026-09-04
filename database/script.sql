@@ -171,15 +171,15 @@ INSERT INTO usuarios (nome, email, senha, perfil) VALUES
 ('Fernanda Santos', 'fernanda@nautica.com', 'tecnico123', 'TECNICO');
 
 -- Embarcações
-INSERT INTO embarcacoes (nome, modelo, capacidade_passageiros, ano_fabricacao, horimetro_horas, status) VALUES
-('Titan Fluvial I', 'Catamarã 40ft', 60, 2021, 250, 'ATIVA'),
-('Lobo do Mar', 'Lancha Rápida 28ft', 12, 2019, 180, 'ATIVA'),
-('Nautico Prime', 'Empurrador Fluvial', 6, 2018, 420, 'EM_MANUTENCAO');
+INSERT INTO embarcacoes (nome, modelo, capacidade_passageiros, capacidade_carga_ton, ano_fabricacao, horimetro_horas, status) VALUES
+('Titan Fluvial I', 'Catamarã 40ft', 60, 1200, 2021, 250, 'ATIVA'),
+('Lobo do Mar', 'Lancha Rápida 28ft', 12, 3000, 2019, 180, 'ATIVA'),
+('Nautico Prime', 'Empurrador Fluvial', 6, 4300, 2018, 420, 'EM_MANUTENCAO');
 
 -- Tripulantes
 INSERT INTO tripulantes (nome, cpf, categoria_habilitacao, numero_registro_cir, data_vencimento_cir) VALUES
-('João Silva', '111.222.333-44', 'PILOTO_FLUVIAL', 'CIR-998877', '2027-12-31'),
-('Marcos Souza', '555.666.777-88', 'CONDUTOR_FLUVIAL', 'CIR-112233', '2026-06-15');
+('João Silva', '111.222.333-44', 'PILOTO_FLUVIAL', '998877', '2027-12-31'),
+('Marcos Souza', '555.666.777-88', 'CONDUTOR_FLUVIAL', '112233', '2026-06-15');
 
 -- Rotas
 INSERT INTO rotas (nome) VALUES

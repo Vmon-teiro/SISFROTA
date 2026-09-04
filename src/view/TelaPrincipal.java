@@ -194,13 +194,13 @@ private JPanel criarHeaderRefinado() {
 
     switch (perfil) {
         case "ADMINISTRADOR":
-            caminhoRelativo = "docs/images/cavalo.jpg";
+            caminhoRelativo = "docs/images (sistema)/cavalo.jpg";
             break;
         case "OPERADOR":
-            caminhoRelativo = "docs/images/cara1.png";
+            caminhoRelativo = "docs/images (sistema)/cara1.png";
             break;
         case "TECNICO":
-            caminhoRelativo = "docs/images/outrocara.jpg";
+            caminhoRelativo = "docs/images (sistema)/outrocara.jpg";
             break;
         default:
             caminhoRelativo = null;
