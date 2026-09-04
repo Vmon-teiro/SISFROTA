@@ -72,7 +72,7 @@ public class TelaLogin extends JFrame {
         lblIcone.setAlignmentX(Component.CENTER_ALIGNMENT);
         lblIcone.setBorder(BorderFactory.createEmptyBorder(10, 0, 5, 0));
 
-        JLabel lblTitulo = new JLabel("Gestão Náutica");
+        JLabel lblTitulo = new JLabel("SISFROTA");
         lblTitulo.setFont(new Font("Segoe UI", Font.BOLD, 22));
         lblTitulo.setForeground(TEXT_TITLE);
         lblTitulo.setAlignmentX(Component.CENTER_ALIGNMENT);
